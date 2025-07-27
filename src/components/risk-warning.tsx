@@ -75,9 +75,9 @@ const RiskWarning: React.FC<RiskWarningProps> = ({
         }
 
         setRiskData({
-          website_name: submissions[0].website?.name || '',
-          country_name: submissions[0].country?.name || '',
-          project_name: submissions[0].project?.name || '',
+          website_name: (submissions[0].website as any)?.name || '',
+          country_name: (submissions[0].country as any)?.name || '',
+          project_name: (submissions[0].project as any)?.name || '',
           failure_count: failureCount,
           success_count: successCount,
           failure_rate: failureRate,
