@@ -11,7 +11,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* 顶部导航 */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-1 md:py-2">
+        <div className="container mx-auto px-4 py-2 md:py-3">
           <div className="flex items-center justify-between">
             {/* 标题区域 */}
             <div className="flex items-center space-x-2">
@@ -20,38 +20,41 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
             
             {/* 导航区域 - 移动端优化 */}
-            <nav className="flex space-x-1">
+            <nav className="flex space-x-2">
               <Button
                 variant={location.pathname === '/' ? 'default' : 'ghost'}
                 asChild
-                className="px-2 py-1 h-7 text-xs"
+                className="px-3 py-2 h-9 text-sm"
                 size="sm"
               >
                 <Link to="/" className="flex items-center space-x-1">
-                  <List className="h-3 w-3" />
-                  <span className="hidden xs:inline">指南</span>
+                  <List className="h-4 w-4" />
+                  <span className="hidden sm:inline">避坑指南</span>
+                  <span className="sm:hidden">指南</span>
                 </Link>
               </Button>
               <Button
                 variant={location.pathname === '/submit' ? 'default' : 'ghost'}
                 asChild
-                className="px-2 py-1 h-7 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                className="px-3 py-2 h-9 text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"
                 size="sm"
               >
                 <Link to="/submit" className="flex items-center space-x-1">
-                  <Home className="h-3 w-3" />
-                  <span className="hidden xs:inline">提交</span>
+                  <Home className="h-4 w-4" />
+                  <span className="hidden sm:inline">提交避坑</span>
+                  <span className="sm:hidden">提交</span>
                 </Link>
               </Button>
               <Button
                 variant={location.pathname === '/admin' ? 'default' : 'ghost'}
                 asChild
-                className="px-2 py-1 h-7 text-xs"
+                className="px-3 py-2 h-9 text-sm"
                 size="sm"
               >
                 <Link to="/admin" className="flex items-center space-x-1">
-                  <Settings className="h-3 w-3" />
-                  <span className="hidden xs:inline">管理</span>
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden sm:inline">管理后台</span>
+                  <span className="sm:hidden">管理</span>
                 </Link>
               </Button>
             </nav>
