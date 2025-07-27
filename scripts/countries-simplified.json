@@ -1,0 +1,302 @@
+{
+  "russia": {
+    "iso": {"ru": 1},
+    "prefix": {"+7": 1},
+    "text_en": "Russia",
+    "text_zh": "俄罗斯"
+  },
+  "ukraine": {
+    "iso": {"ua": 1},
+    "prefix": {"+380": 1},
+    "text_en": "Ukraine",
+    "text_zh": "乌克兰"
+  },
+  "kazakhstan": {
+    "iso": {"kz": 1},
+    "prefix": {"+7": 1},
+    "text_en": "Kazakhstan",
+    "text_zh": "哈萨克斯坦"
+  },
+  "china": {
+    "iso": {"cn": 1},
+    "prefix": {"+86": 1},
+    "text_en": "China",
+    "text_zh": "中国"
+  },
+  "philippines": {
+    "iso": {"ph": 1},
+    "prefix": {"+63": 1},
+    "text_en": "Philippines",
+    "text_zh": "菲律宾"
+  },
+  "myanmar": {
+    "iso": {"mm": 1},
+    "prefix": {"+95": 1},
+    "text_en": "Myanmar",
+    "text_zh": "缅甸"
+  },
+  "indonesia": {
+    "iso": {"id": 1},
+    "prefix": {"+62": 1},
+    "text_en": "Indonesia",
+    "text_zh": "印度尼西亚"
+  },
+  "malaysia": {
+    "iso": {"my": 1},
+    "prefix": {"+60": 1},
+    "text_en": "Malaysia",
+    "text_zh": "马来西亚"
+  },
+  "kenya": {
+    "iso": {"ke": 1},
+    "prefix": {"+254": 1},
+    "text_en": "Kenya",
+    "text_zh": "肯尼亚"
+  },
+  "tanzania": {
+    "iso": {"tz": 1},
+    "prefix": {"+255": 1},
+    "text_en": "Tanzania",
+    "text_zh": "坦桑尼亚"
+  },
+  "vietnam": {
+    "iso": {"vn": 1},
+    "prefix": {"+84": 1},
+    "text_en": "Vietnam",
+    "text_zh": "越南"
+  },
+  "kyrgyzstan": {
+    "iso": {"kg": 1},
+    "prefix": {"+996": 1},
+    "text_en": "Kyrgyzstan",
+    "text_zh": "吉尔吉斯斯坦"
+  },
+  "usa": {
+    "iso": {"us": 1},
+    "prefix": {"+1": 1},
+    "text_en": "USA",
+    "text_zh": "美国"
+  },
+  "israel": {
+    "iso": {"il": 1},
+    "prefix": {"+972": 1},
+    "text_en": "Israel",
+    "text_zh": "以色列"
+  },
+  "hongkong": {
+    "iso": {"hk": 1},
+    "prefix": {"+852": 1},
+    "text_en": "Hong Kong",
+    "text_zh": "香港"
+  },
+  "poland": {
+    "iso": {"pl": 1},
+    "prefix": {"+48": 1},
+    "text_en": "Poland",
+    "text_zh": "波兰"
+  },
+  "england": {
+    "iso": {"gb": 1},
+    "prefix": {"+44": 1},
+    "text_en": "England",
+    "text_zh": "英国"
+  },
+  "madagascar": {
+    "iso": {"mg": 1},
+    "prefix": {"+261": 1},
+    "text_en": "Madagascar",
+    "text_zh": "马达加斯加"
+  },
+  "congo": {
+    "iso": {"cd": 1},
+    "prefix": {"+243": 1},
+    "text_en": "Congo",
+    "text_zh": "刚果民主共和国"
+  },
+  "nigeria": {
+    "iso": {"ng": 1},
+    "prefix": {"+234": 1},
+    "text_en": "Nigeria",
+    "text_zh": "尼日利亚"
+  },
+  "macau": {
+    "iso": {"mo": 1},
+    "prefix": {"+853": 1},
+    "text_en": "Macau",
+    "text_zh": "澳门"
+  },
+  "egypt": {
+    "iso": {"eg": 1},
+    "prefix": {"+20": 1},
+    "text_en": "Egypt",
+    "text_zh": "埃及"
+  },
+  "india": {
+    "iso": {"in": 1},
+    "prefix": {"+91": 1},
+    "text_en": "India",
+    "text_zh": "印度"
+  },
+  "ireland": {
+    "iso": {"ie": 1},
+    "prefix": {"+353": 1},
+    "text_en": "Ireland",
+    "text_zh": "爱尔兰"
+  },
+  "cambodia": {
+    "iso": {"kh": 1},
+    "prefix": {"+855": 1},
+    "text_en": "Cambodia",
+    "text_zh": "柬埔寨"
+  },
+  "laos": {
+    "iso": {"la": 1},
+    "prefix": {"+856": 1},
+    "text_en": "Laos",
+    "text_zh": "老挝"
+  },
+  "haiti": {
+    "iso": {"ht": 1},
+    "prefix": {"+509": 1},
+    "text_en": "Haiti",
+    "text_zh": "海地"
+  },
+  "ivorycoast": {
+    "iso": {"ci": 1},
+    "prefix": {"+225": 1},
+    "text_en": "Ivory Coast",
+    "text_zh": "科特迪瓦"
+  },
+  "gambia": {
+    "iso": {"gm": 1},
+    "prefix": {"+220": 1},
+    "text_en": "Gambia",
+    "text_zh": "冈比亚"
+  },
+  "sierraleone": {
+    "iso": {"sl": 1},
+    "prefix": {"+232": 1},
+    "text_en": "Sierra Leone",
+    "text_zh": "塞拉利昂"
+  },
+  "burkinafaso": {
+    "iso": {"bf": 1},
+    "prefix": {"+226": 1},
+    "text_en": "Burkina Faso",
+    "text_zh": "布基纳法索"
+  },
+  "togo": {
+    "iso": {"tg": 1},
+    "prefix": {"+228": 1},
+    "text_en": "Togo",
+    "text_zh": "多哥"
+  },
+  "guineabissau": {
+    "iso": {"gw": 1},
+    "prefix": {"+245": 1},
+    "text_en": "Guinea-Bissau",
+    "text_zh": "几内亚比绍"
+  },
+  "liberia": {
+    "iso": {"lr": 1},
+    "prefix": {"+231": 1},
+    "text_en": "Liberia",
+    "text_zh": "利比里亚"
+  },
+  "benin": {
+    "iso": {"bj": 1},
+    "prefix": {"+229": 1},
+    "text_en": "Benin",
+    "text_zh": "贝宁"
+  },
+  "guinea": {
+    "iso": {"gn": 1},
+    "prefix": {"+224": 1},
+    "text_en": "Guinea",
+    "text_zh": "几内亚"
+  },
+  "mali": {
+    "iso": {"ml": 1},
+    "prefix": {"+223": 1},
+    "text_en": "Mali",
+    "text_zh": "马里"
+  },
+  "angola": {
+    "iso": {"ao": 1},
+    "prefix": {"+244": 1},
+    "text_en": "Angola",
+    "text_zh": "安哥拉"
+  },
+  "chad": {
+    "iso": {"td": 1},
+    "prefix": {"+235": 1},
+    "text_en": "Chad",
+    "text_zh": "乍得"
+  },
+  "cameroon": {
+    "iso": {"cm": 1},
+    "prefix": {"+237": 1},
+    "text_en": "Cameroon",
+    "text_zh": "喀麦隆"
+  },
+  "morocco": {
+    "iso": {"ma": 1},
+    "prefix": {"+212": 1},
+    "text_en": "Morocco",
+    "text_zh": "摩洛哥"
+  },
+  "ghana": {
+    "iso": {"gh": 1},
+    "prefix": {"+233": 1},
+    "text_en": "Ghana",
+    "text_zh": "加纳"
+  },
+  "algeria": {
+    "iso": {"dz": 1},
+    "prefix": {"+213": 1},
+    "text_en": "Algeria",
+    "text_zh": "阿尔及利亚"
+  },
+  "uganda": {
+    "iso": {"ug": 1},
+    "prefix": {"+256": 1},
+    "text_en": "Uganda",
+    "text_zh": "乌干达"
+  },
+  "mozambique": {
+    "iso": {"mz": 1},
+    "prefix": {"+258": 1},
+    "text_en": "Mozambique",
+    "text_zh": "莫桑比克"
+  },
+  "zimbabwe": {
+    "iso": {"zw": 1},
+    "prefix": {"+263": 1},
+    "text_en": "Zimbabwe",
+    "text_zh": "津巴布韦"
+  },
+  "zambia": {
+    "iso": {"zm": 1},
+    "prefix": {"+260": 1},
+    "text_en": "Zambia",
+    "text_zh": "赞比亚"
+  },
+  "southafrica": {
+    "iso": {"za": 1},
+    "prefix": {"+27": 1},
+    "text_en": "South Africa",
+    "text_zh": "南非"
+  },
+  "rwanda": {
+    "iso": {"rw": 1},
+    "prefix": {"+250": 1},
+    "text_en": "Rwanda",
+    "text_zh": "卢旺达"
+  },
+  "malawi": {
+    "iso": {"mw": 1},
+    "prefix": {"+265": 1},
+    "text_en": "Malawi",
+    "text_zh": "马拉维"
+  }
+}

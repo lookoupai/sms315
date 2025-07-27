@@ -1,0 +1,302 @@
+[
+  {
+    "name": "Algeria",
+    "name_zh": "阿尔及利亚",
+    "code": "dz",
+    "phone_code": "+213"
+  },
+  {
+    "name": "Angola",
+    "name_zh": "安哥拉",
+    "code": "ao",
+    "phone_code": "+244"
+  },
+  {
+    "name": "Benin",
+    "name_zh": "贝宁",
+    "code": "bj",
+    "phone_code": "+229"
+  },
+  {
+    "name": "Burkina Faso",
+    "name_zh": "布基纳法索",
+    "code": "bf",
+    "phone_code": "+226"
+  },
+  {
+    "name": "Cambodia",
+    "name_zh": "柬埔寨",
+    "code": "kh",
+    "phone_code": "+855"
+  },
+  {
+    "name": "Cameroon",
+    "name_zh": "喀麦隆",
+    "code": "cm",
+    "phone_code": "+237"
+  },
+  {
+    "name": "Chad",
+    "name_zh": "乍得",
+    "code": "td",
+    "phone_code": "+235"
+  },
+  {
+    "name": "China",
+    "name_zh": "中国",
+    "code": "cn",
+    "phone_code": "+86"
+  },
+  {
+    "name": "Congo",
+    "name_zh": "刚果民主共和国",
+    "code": "cd",
+    "phone_code": "+243"
+  },
+  {
+    "name": "Egypt",
+    "name_zh": "埃及",
+    "code": "eg",
+    "phone_code": "+20"
+  },
+  {
+    "name": "England",
+    "name_zh": "英国",
+    "code": "gb",
+    "phone_code": "+44"
+  },
+  {
+    "name": "Gambia",
+    "name_zh": "冈比亚",
+    "code": "gm",
+    "phone_code": "+220"
+  },
+  {
+    "name": "Ghana",
+    "name_zh": "加纳",
+    "code": "gh",
+    "phone_code": "+233"
+  },
+  {
+    "name": "Guinea",
+    "name_zh": "几内亚",
+    "code": "gn",
+    "phone_code": "+224"
+  },
+  {
+    "name": "Guinea-Bissau",
+    "name_zh": "几内亚比绍",
+    "code": "gw",
+    "phone_code": "+245"
+  },
+  {
+    "name": "Haiti",
+    "name_zh": "海地",
+    "code": "ht",
+    "phone_code": "+509"
+  },
+  {
+    "name": "Hong Kong",
+    "name_zh": "香港",
+    "code": "hk",
+    "phone_code": "+852"
+  },
+  {
+    "name": "India",
+    "name_zh": "印度",
+    "code": "in",
+    "phone_code": "+91"
+  },
+  {
+    "name": "Indonesia",
+    "name_zh": "印度尼西亚",
+    "code": "id",
+    "phone_code": "+62"
+  },
+  {
+    "name": "Ireland",
+    "name_zh": "爱尔兰",
+    "code": "ie",
+    "phone_code": "+353"
+  },
+  {
+    "name": "Israel",
+    "name_zh": "以色列",
+    "code": "il",
+    "phone_code": "+972"
+  },
+  {
+    "name": "Ivory Coast",
+    "name_zh": "科特迪瓦",
+    "code": "ci",
+    "phone_code": "+225"
+  },
+  {
+    "name": "Kazakhstan",
+    "name_zh": "哈萨克斯坦",
+    "code": "kz",
+    "phone_code": "+7"
+  },
+  {
+    "name": "Kenya",
+    "name_zh": "肯尼亚",
+    "code": "ke",
+    "phone_code": "+254"
+  },
+  {
+    "name": "Kyrgyzstan",
+    "name_zh": "吉尔吉斯斯坦",
+    "code": "kg",
+    "phone_code": "+996"
+  },
+  {
+    "name": "Laos",
+    "name_zh": "老挝",
+    "code": "la",
+    "phone_code": "+856"
+  },
+  {
+    "name": "Liberia",
+    "name_zh": "利比里亚",
+    "code": "lr",
+    "phone_code": "+231"
+  },
+  {
+    "name": "Macau",
+    "name_zh": "澳门",
+    "code": "mo",
+    "phone_code": "+853"
+  },
+  {
+    "name": "Madagascar",
+    "name_zh": "马达加斯加",
+    "code": "mg",
+    "phone_code": "+261"
+  },
+  {
+    "name": "Malawi",
+    "name_zh": "马拉维",
+    "code": "mw",
+    "phone_code": "+265"
+  },
+  {
+    "name": "Malaysia",
+    "name_zh": "马来西亚",
+    "code": "my",
+    "phone_code": "+60"
+  },
+  {
+    "name": "Mali",
+    "name_zh": "马里",
+    "code": "ml",
+    "phone_code": "+223"
+  },
+  {
+    "name": "Morocco",
+    "name_zh": "摩洛哥",
+    "code": "ma",
+    "phone_code": "+212"
+  },
+  {
+    "name": "Mozambique",
+    "name_zh": "莫桑比克",
+    "code": "mz",
+    "phone_code": "+258"
+  },
+  {
+    "name": "Myanmar",
+    "name_zh": "缅甸",
+    "code": "mm",
+    "phone_code": "+95"
+  },
+  {
+    "name": "Nigeria",
+    "name_zh": "尼日利亚",
+    "code": "ng",
+    "phone_code": "+234"
+  },
+  {
+    "name": "Philippines",
+    "name_zh": "菲律宾",
+    "code": "ph",
+    "phone_code": "+63"
+  },
+  {
+    "name": "Poland",
+    "name_zh": "波兰",
+    "code": "pl",
+    "phone_code": "+48"
+  },
+  {
+    "name": "Russia",
+    "name_zh": "俄罗斯",
+    "code": "ru",
+    "phone_code": "+7"
+  },
+  {
+    "name": "Rwanda",
+    "name_zh": "卢旺达",
+    "code": "rw",
+    "phone_code": "+250"
+  },
+  {
+    "name": "Sierra Leone",
+    "name_zh": "塞拉利昂",
+    "code": "sl",
+    "phone_code": "+232"
+  },
+  {
+    "name": "South Africa",
+    "name_zh": "南非",
+    "code": "za",
+    "phone_code": "+27"
+  },
+  {
+    "name": "Tanzania",
+    "name_zh": "坦桑尼亚",
+    "code": "tz",
+    "phone_code": "+255"
+  },
+  {
+    "name": "Togo",
+    "name_zh": "多哥",
+    "code": "tg",
+    "phone_code": "+228"
+  },
+  {
+    "name": "Uganda",
+    "name_zh": "乌干达",
+    "code": "ug",
+    "phone_code": "+256"
+  },
+  {
+    "name": "Ukraine",
+    "name_zh": "乌克兰",
+    "code": "ua",
+    "phone_code": "+380"
+  },
+  {
+    "name": "USA",
+    "name_zh": "美国",
+    "code": "us",
+    "phone_code": "+1"
+  },
+  {
+    "name": "Vietnam",
+    "name_zh": "越南",
+    "code": "vn",
+    "phone_code": "+84"
+  },
+  {
+    "name": "Zambia",
+    "name_zh": "赞比亚",
+    "code": "zm",
+    "phone_code": "+260"
+  },
+  {
+    "name": "Zimbabwe",
+    "name_zh": "津巴布韦",
+    "code": "zw",
+    "phone_code": "+263"
+  }
+]
