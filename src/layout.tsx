@@ -22,37 +22,37 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             {/* 导航区域 - 移动端优化 */}
             <nav className="flex space-x-2">
               <Button
-                variant={location.pathname === '/submit' ? 'default' : 'ghost'}
+                variant={location.pathname === '/' ? 'default' : 'ghost'}
                 asChild
                 className="px-3 py-2 h-9 text-sm"
                 size="sm"
               >
                 <Link to="/" className="flex items-center space-x-1">
-                  <List className="h-4 w-4" />
+                  <List className="h-3 w-3 md:h-4 md:w-4" />
                   <span className="hidden sm:inline">避坑指南</span>
                   <span className="sm:hidden">指南</span>
                 </Link>
               </Button>
               <Button
-                variant={location.pathname === '/submit' ? 'default' : 'ghost'}
+                variant={location.pathname.startsWith('/submit') ? 'default' : 'ghost'}
                 asChild
-                className="px-3 py-2 h-9 text-sm bg-blue-600 hover:bg-blue-700 text-white border-0"
+                className="px-3 py-2 h-9 text-sm"
                 size="sm"
               >
                 <Link to="/submit" className="flex items-center space-x-1">
-                  <Home className="h-4 w-4" />
+                  <Home className="h-3 w-3 md:h-4 md:w-4" />
                   <span className="hidden sm:inline">提交避坑</span>
                   <span className="sm:hidden">提交</span>
                 </Link>
               </Button>
               <Button
-                variant={location.pathname === '/admin' ? 'default' : 'ghost'}
+                variant={location.pathname.startsWith('/admin') ? 'default' : 'ghost'}
                 asChild
                 className="px-3 py-2 h-9 text-sm"
                 size="sm"
               >
                 <Link to="/admin" className="flex items-center space-x-1">
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-3 w-3 md:h-4 md:w-4" />
                   <span className="hidden sm:inline">管理后台</span>
                   <span className="sm:hidden">管理</span>
                 </Link>
