@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://ptgfnwftmjdmuclndqmc.supabase.co'
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0Z2Zud2Z0bWpkbXVjbG5kcW1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1MTM2MzMsImV4cCI6MjA2OTA4OTYzM30.-3ug0wxcAv7M5qY-CdP_VcDcL4DJRXexvevcHGMmVKA'
+// 使用环境变量配置 Supabase，提高安全性
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ptgfnwftmjdmuclndqmc.supabase.co'
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0Z2Zud2Z0bWpkbXVjbG5kcW1jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1MTM2MzMsImV4cCI6MjA2OTA4OTYzM30.-3ug0wxcAv7M5qY-CdP_VcDcL4DJRXexvevcHGMmVKA'
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 

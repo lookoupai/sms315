@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 引入统一设计系统 */
+@import './styles/design-system.css';
+
 @layer base {
   :root {
     --background: 0 0% 100%;

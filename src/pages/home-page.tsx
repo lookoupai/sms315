@@ -1,267 +1,243 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { AlertTriangle, Send, Heart, Shield } from 'lucide-react';
-import { getWebsites, getCountries, getProjects } from '../services/database';
-import SearchableCountrySelect from '../components/SearchableCountrySelect';
-import type { Website, Country, Project } from '../lib/supabase';
+import { AlertTriangle, Send, Heart, Shield, Search, Filter, TrendingUp, Users } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
-const HomePage = () => {
-  const [formData, setFormData] = useState({
-    website: '',
-    country: '',
-    project: '',
-    result: '',
-    note: ''
-  });
+interface Submission {
+  id: number;
+  website_name: string;
+  country_name: string;
+  project_name: string;
+  result: 'success' | 'failure';
+  created_at: string;
+  failure_reason?: string;
+  备注?: string;
+}
 
-  // 数据状态
-  const [websites, setWebsites] = useState<Website[]>([]);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
+export default function HomePage() {
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterResult, setFilterResult] = useState<'all' | 'success' | 'failure'>('all');
+  const navigate = useNavigate();
 
-  // 加载数据
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [websitesData, countriesData, projectsData] = await Promise.all([
-          getWebsites(),
-          getCountries(),
-          getProjects()
-        ]);
-        
-        setWebsites(websitesData);
-        setCountries(countriesData);
-        setProjects(projectsData);
-      } catch (error) {
-        console.error('加载数据失败:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
+    fetchSubmissions();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('提交数据:', formData);
-    // 这里将来会连接到API
-    alert('感谢分享！你的经验将帮助其他人避坑。');
+  const fetchSubmissions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('submissions')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      setSubmissions(data || []);
+    } catch (error) {
+      console.error('获取数据失败:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen py-12 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">正在加载数据...</p>
-        </div>
-      </div>
-    );
-  }
+  const filteredSubmissions = submissions.filter(submission => {
+    const matchesSearch = 
+      submission.website_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      submission.country_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      submission.project_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesFilter = filterResult === 'all' || submission.result === filterResult;
+    
+    return matchesSearch && matchesFilter;
+  });
+
+  const successCount = submissions.filter(s => s.result === 'success').length;
+  const failureCount = submissions.filter(s => s.result === 'failure').length;
+  const totalCount = submissions.length;
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
-        {/* 主标题区域 */}
-        <div className="text-center mb-12 animate-fade-in-up">
-          <div className="flex items-center justify-center mb-6">
-            <div className="bg-gradient-to-r from-red-500 to-pink-500 p-4 rounded-full shadow-lg">
-              <Shield className="h-12 w-12 text-white" />
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        
+        {/* 主标题区域 - 统一风格 */}
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center mb-4">
+            <Heart className="h-8 w-8 text-blue-600 mr-3" />
+            <h1 className="heading-primary text-blue-900">
+              帮助他人避坑
+            </h1>
           </div>
-          <h1 className="title-main mb-4">帮助他人避坑</h1>
-          <p className="text-xl text-gray-600 mb-2">分享你的接码失败经历，让其他人少花冤枉钱</p>
-          <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-            <Heart className="h-4 w-4 text-red-500" />
-            <span>你的分享很有价值</span>
-          </div>
-        </div>
-
-        {/* 主要表单区域 */}
-        <div className="form-section animate-fade-in-up">
-          <div className="flex items-center space-x-3 mb-8">
-            <AlertTriangle className="h-8 w-8 text-red-500" />
-            <h2 className="title-section">分享接码经历</h2>
-          </div>
-          
-          <p className="text-gray-600 mb-8 text-lg">
-            刚刚接码失败了？分享一下，让其他人避免同样的损失
+          <p className="text-body text-xl max-w-2xl mx-auto">
+            分享你的接码失败经历，让其他人少花冤枉钱
           </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* 接码网站选择 */}
-            <div>
-              <Label className="form-label">
-                接码网站 <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                className="form-select"
-                value={formData.website}
-                onValueChange={(value: string) => setFormData({...formData, website: value})}
-                required
-              >
-                <option value="">请选择接码网站</option>
-                {websites.map(site => (
-                  <option key={site.id} value={site.id}>
-                    {site.name} ({site.url})
-                  </option>
-                ))}
-              </Select>
-            </div>
+        {/* 统计卡片区域 - 统一风格 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="card-primary">
+            <CardContent className="p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Users className="h-6 w-6 text-blue-600 mr-2" />
+                <span className="text-2xl font-bold text-blue-600">{totalCount}</span>
+              </div>
+              <p className="text-gray-600">总提交数</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="card-success">
+            <CardContent className="p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Shield className="h-6 w-6 text-green-600 mr-2" />
+                <span className="text-2xl font-bold text-green-600">{successCount}</span>
+              </div>
+              <p className="text-green-700">成功案例</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="card-error">
+            <CardContent className="p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <AlertTriangle className="h-6 w-6 text-red-600 mr-2" />
+                <span className="text-2xl font-bold text-red-600">{failureCount}</span>
+              </div>
+              <p className="text-red-700">失败案例</p>
+            </CardContent>
+          </Card>
+        </div>
 
-            {/* 接码国家选择 */}
-            <div>
-              <Label className="form-label">
-                接码国家 <span className="text-red-500">*</span>
-              </Label>
-              <SearchableCountrySelect
-                countries={countries}
-                value={formData.country}
-                onValueChange={(value: string) => setFormData({...formData, country: value})}
-                placeholder="请选择国家（可搜索名称、代码或区号）"
-              />
-            </div>
-
-            {/* 接码项目选择 */}
-            <div>
-              <Label className="form-label">
-                接码项目 <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                className="form-select"
-                value={formData.project}
-                onValueChange={(value: string) => setFormData({...formData, project: value})}
-                required
-              >
-                <option value="">请选择项目</option>
-                {projects.map(project => (
-                  <option key={project.id} value={project.id}>
-                    {project.name}
-                  </option>
-                ))}
-              </Select>
-            </div>
-
-            {/* 接码结果选择 */}
-            <div>
-              <Label className="form-label">
-                接码结果 <span className="text-red-500">*</span>
-              </Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                <label className={`radio-option failure ${formData.result === 'failure' ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="result"
-                    value="failure"
-                    checked={formData.result === 'failure'}
-                    onChange={(e) => setFormData({...formData, result: e.target.value})}
-                    className="sr-only"
+        {/* 搜索和筛选区域 - 统一风格 */}
+        <Card className="card-primary mb-8">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="搜索网站、国家或项目..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
                   />
-                  <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 rounded-full border-2 border-red-400 flex items-center justify-center">
-                      {formData.result === 'failure' && (
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-red-700">接码失败</div>
-                      <div className="text-sm text-red-600">帮助他人避坑</div>
+                </div>
+              </div>
+              <div className="md:w-48">
+                <Select value={filterResult} onValueChange={(value: 'all' | 'success' | 'failure') => setFilterResult(value)}>
+                  <option value="all">全部结果</option>
+                  <option value="success">仅成功</option>
+                  <option value="failure">仅失败</option>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 快速操作按钮 - 统一风格 */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center">
+          <Button 
+            onClick={() => navigate('/submit')}
+            className="btn-primary flex items-center gap-2 px-8 py-3 text-lg"
+          >
+            <Send className="h-5 w-5" />
+            分享接码经历
+          </Button>
+          <Button 
+            onClick={() => navigate('/guide')}
+            className="btn-secondary flex items-center gap-2 px-8 py-3 text-lg"
+          >
+            <TrendingUp className="h-5 w-5" />
+            查看完整指南
+          </Button>
+        </div>
+
+        {/* 最新提交列表 - 统一风格 */}
+        <Card className="card-primary">
+          <CardHeader>
+            <CardTitle className="heading-secondary flex items-center gap-2">
+              <Filter className="h-5 w-5 text-blue-600" />
+              最新提交记录
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            {loading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="text-gray-500 mt-2">加载中...</p>
+              </div>
+            ) : filteredSubmissions.length === 0 ? (
+              <div className="text-center py-8">
+                <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">暂无匹配的记录</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredSubmissions.slice(0, 10).map((submission) => (
+                  <div
+                    key={submission.id}
+                    className={`p-4 rounded-lg border-l-4 transition-colors ${
+                      submission.result === 'success'
+                        ? 'border-l-green-500 bg-green-50 hover:bg-green-100'
+                        : 'border-l-red-500 bg-red-50 hover:bg-red-100'
+                    }`}
+                  >
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-gray-900">{submission.website_name}</span>
+                          <span className="text-sm text-gray-500">•</span>
+                          <span className="text-sm text-gray-600">{submission.country_name}</span>
+                          <span className="text-sm text-gray-500">•</span>
+                          <span className="text-sm text-gray-600">{submission.project_name}</span>
+                        </div>
+                        {submission.result === 'failure' && submission.failure_reason && (
+                          <p className="text-sm text-red-600 mt-1">
+                            失败原因: {submission.failure_reason}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          submission.result === 'success'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-red-100 text-red-700'
+                        }`}>
+                          {submission.result === 'success' ? '成功' : '失败'}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(submission.created_at).toLocaleDateString('zh-CN')}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </label>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-                <label className={`radio-option success ${formData.result === 'success' ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name="result"
-                    value="success"
-                    checked={formData.result === 'success'}
-                    onChange={(e) => setFormData({...formData, result: e.target.value})}
-                    className="sr-only"
-                  />
-                  <div className="flex items-center space-x-3">
-                    <div className="w-5 h-5 rounded-full border-2 border-green-400 flex items-center justify-center">
-                      {formData.result === 'success' && (
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      )}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-green-700">接码成功</div>
-                      <div className="text-sm text-green-600">分享经验</div>
-                    </div>
-                  </div>
-                </label>
+        {/* 温馨提示 - 统一风格 */}
+        <Card className="card-warning mt-8">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-6 w-6 text-yellow-600 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-yellow-800 mb-2">温馨提示</h3>
+                <div className="text-yellow-700 space-y-2 text-sm">
+                  <p>• 失败原因具有时效性，但仍具参考价值，建议谨慎选择这些组合</p>
+                  <p>• 成功案例仅供参考，不保证100%成功，请根据实际情况判断</p>
+                  <p>• 如有疑问或需要帮助，请联系管理员</p>
+                </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* 备注说明 */}
-            <div>
-              <Label className="form-label">备注说明 (可选)</Label>
-              <Textarea
-                className="form-textarea"
-                placeholder="可以描述具体的失败原因或成功经验..."
-                value={formData.note}
-                onChange={(e) => setFormData({...formData, note: e.target.value})}
-                rows={4}
-              />
-            </div>
-
-            {/* 提交按钮 */}
-            <div className="pt-6">
-              <Button type="submit" className="btn-primary w-full md:w-auto">
-                <Send className="h-5 w-5 mr-2" />
-                提交分享
-              </Button>
-            </div>
-          </form>
-        </div>
-
-        {/* 温馨提示 */}
-        <div className="mt-12 animate-fade-in-up">
-          <div className="card-modern p-8">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <AlertTriangle className="h-6 w-6 text-blue-500 mr-2" />
-              温馨提示
-            </h3>
-            <div className="space-y-3 text-gray-600">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-                <p>分享失败经历可以帮助其他人避免重复付费</p>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-                <p>你的分享是匿名的，不会记录个人信息</p>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
-                <p>如果没有找到合适的选项，可以联系管理员添加</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* 重要提醒 */}
-        <div className="mt-8 animate-fade-in-up">
-          <div className="warning-card">
-            <div className="flex items-center space-x-3 mb-4">
-              <AlertTriangle className="h-6 w-6 text-yellow-600" />
-              <h3 className="text-xl font-bold text-yellow-800">重要提醒</h3>
-            </div>
-            <p className="text-yellow-700 text-lg">
-              失败信息有时效性，但近期的失败记录参考价值很高，建议避开这些组合
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
-};
-
-export default HomePage;
+}

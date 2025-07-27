@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Textarea } from '../components/ui/textarea'
@@ -382,10 +382,6 @@ export default function SubmitPageNew() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-4 md:py-8">
       <div className="max-w-2xl mx-auto px-4">
-        {/* 成功标识 */}
-        <div className="mb-4 p-4 bg-green-100 border border-green-300 rounded-lg">
-          <p className="text-green-700 font-bold">🎉 新版本提交页面已加载！现在支持搜索功能！</p>
-        </div>
 
         {/* 页面标题 */}
         {/* 页面标题 - 移动端优化 */}
@@ -667,11 +663,11 @@ export default function SubmitPageNew() {
 
               {/* 提交按钮 */}
               {/* 提交按钮 - 移动端优化 */}
-              <Button 
-                type="submit" 
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 md:py-4 text-base md:text-lg shadow-lg hover:shadow-xl transition-all duration-200 min-h-[48px] md:min-h-[56px]"
-                disabled={submitting}
-              >
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="btn-primary w-full py-3 px-6 text-lg flex items-center justify-center gap-2"
+          >
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 md:h-5 md:w-5 mr-2 animate-spin" />

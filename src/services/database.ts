@@ -160,7 +160,7 @@ export async function createSubmission(submission: {
 
 // 检查IP频率限制
 export async function checkIpLimit(ip_address: string): Promise<boolean> {
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+  // const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString()
   
   const { data, error } = await supabase
     .from('ip_logs')

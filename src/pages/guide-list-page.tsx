@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+// import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertTriangle, CheckCircle, Search, Filter, Clock, ExternalLink } from 'lucide-react'
@@ -207,7 +207,7 @@ const GuideListPage = () => {
                 <SelectContent>
                   <SelectItem value="all">全部网站</SelectItem>
                   {getUniqueValues('website').map(website => (
-                    <SelectItem key={website} value={website}>{website}</SelectItem>
+                    <SelectItem key={website} value={website || ''}>{website}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

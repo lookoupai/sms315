@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -29,7 +29,7 @@ import AdminAuth from '../components/admin-auth'
 
 function AdminPageContent() {
   const [activeTab, setActiveTab] = useState<'overview' | 'websites' | 'countries' | 'projects' | 'submissions'>('overview')
-  const [loading, setLoading] = useState(false)
+  const [, setLoading] = useState(false)
   
   // 数据状态
   const [websites, setWebsites] = useState<Website[]>([])
@@ -916,10 +916,8 @@ function AdminPageContent() {
 }
 
 export default function AdminPage() {
-  const [authSuccess, setAuthSuccess] = useState(false)
-
   return (
-    <AdminAuth onAuthSuccess={() => setAuthSuccess(true)}>
+    <AdminAuth onAuthSuccess={() => {}}>
       <AdminPageContent />
     </AdminAuth>
   )

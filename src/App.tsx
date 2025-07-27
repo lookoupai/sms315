@@ -2,7 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "./components/theme-provider";
 import { Toaster } from "./components/ui/toaster";
 import Layout from "./layout";
-import HomePage from "./pages/home-page";
 import GuideListPage from "./pages/guide-list-page";
 import AdminPage from "./pages/admin-page";
 import SubmitPageNew from "./pages/submit-page-new";

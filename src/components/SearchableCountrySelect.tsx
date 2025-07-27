@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { ChevronDown, Search, X } from 'lucide-react'
 import type { Country } from '../lib/supabase'
 

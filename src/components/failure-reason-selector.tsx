@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
 import { Badge } from './ui/badge'
-import { AlertTriangle, Wifi, Server, Shield, HelpCircle } from 'lucide-react'
+import { Wifi, Server, Shield, HelpCircle } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import type { FailureReason } from '../lib/supabase'
 
