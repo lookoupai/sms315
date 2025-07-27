@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Textarea } from '../components/ui/textarea'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
 import { AlertTriangle, Heart, Send, CheckCircle, XCircle, Loader2 } from 'lucide-react'
 import { getWebsites, getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
 import SearchableCountrySelect from '../components/SearchableCountrySelect'
-import SearchableWebsiteSelect from '../components/SearchableWebsiteSelect'
 import SearchableProjectSelect from '../components/SearchableProjectSelect'
 import type { Website, Country, Project } from '../lib/supabase'
 
 export default function SubmitPage() {
-  const [websites, setWebsites] = useState<Website[]>([])
   const [countries, setCountries] = useState<Country[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -42,13 +39,11 @@ export default function SubmitPage() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [websitesData, countriesData, projectsData] = await Promise.all([
-        getWebsites(),
+      const [countriesData, projectsData] = await Promise.all([
         getCountries(),
         getProjects()
       ])
       
-      setWebsites(websitesData)
       setCountries(countriesData)
       setProjects(projectsData)
     } catch (error) {

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
-const Dialog = ({ children, open, onOpenChange }: {
+const Dialog = ({ children, open, onOpenChange: _ }: {
   children: React.ReactNode
   open?: boolean
   onOpenChange?: (open: boolean) => void
