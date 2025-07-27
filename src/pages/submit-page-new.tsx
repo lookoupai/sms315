@@ -665,7 +665,7 @@ export default function SubmitPageNew() {
               {/* 提交按钮 - 移动端优化 */}
           <Button 
             type="submit" 
-            disabled={isSubmitting}
+            disabled={submitting}
             className="btn-primary w-full py-3 px-6 text-lg flex items-center justify-center gap-2"
           >
                 {submitting ? (
