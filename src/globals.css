@@ -1,9 +1,9 @@
+/* 引入统一设计系统 */
+@import './styles/design-system.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* 引入统一设计系统 */
-@import './styles/design-system.css';
 
 @layer base {
   :root {
