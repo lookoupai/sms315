@@ -5,10 +5,10 @@ import { Textarea } from '../components/ui/textarea'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
 import { AlertTriangle, Heart, Send, CheckCircle, XCircle, Loader2 } from 'lucide-react'
-import { getWebsites, getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
+import { getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
 import SearchableCountrySelect from '../components/SearchableCountrySelect'
 import SearchableProjectSelect from '../components/SearchableProjectSelect'
-import type { Website, Country, Project } from '../lib/supabase'
+import type { Country, Project } from '../lib/supabase'
 
 export default function SubmitPage() {
   const [countries, setCountries] = useState<Country[]>([])
