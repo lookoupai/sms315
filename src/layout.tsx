@@ -22,7 +22,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             {/* 导航区域 - 移动端优化 */}
             <nav className="flex space-x-2">
               <Button
-                variant={location.pathname === '/' ? 'default' : 'ghost'}
+                variant={location.pathname === '/submit' ? 'default' : 'ghost'}
                 asChild
                 className="px-3 py-2 h-9 text-sm"
                 size="sm"
