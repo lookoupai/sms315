@@ -1,4 +1,3 @@
-import React from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { Button } from './components/ui/button'
 import { AlertTriangle, List, Home, Settings } from 'lucide-react'
