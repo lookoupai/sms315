@@ -1,5 +1,3 @@
-/* 引入统一设计系统 */
-@import './styles/design-system.css';
 
 @tailwind base;
 @tailwind components;
