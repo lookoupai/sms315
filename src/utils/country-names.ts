@@ -107,6 +107,12 @@ const countryNameToCode: Record<string, string> = {
   '刚果': 'CG',
   '利比里亚': 'LR',
   '加纳': 'GH',
+  '加蓬': 'GA',
+  '博茨瓦纳': 'BW',
+  '卢旺达': 'RW',
+  '危地马拉': 'GT',
+  '厄瓜多尔': 'EC',
+  '台湾': 'TW',
   
   // 英文名称到ISO代码
   'China': 'CN',
@@ -210,7 +216,13 @@ const countryNameToCode: Record<string, string> = {
   'Guinea-Bissau': 'GW',
   'Congo': 'CG',
   'Liberia': 'LR',
-  'Ghana': 'GH'
+  'Ghana': 'GH',
+  'Gabon': 'GA',
+  'Botswana': 'BW',
+  'Rwanda': 'RW',
+  'Guatemala': 'GT',
+  'Ecuador': 'EC',
+  'Taiwan': 'TW'
 }
 
 // ISO代码到常见名称的反向映射（用于fallback）
@@ -356,12 +368,31 @@ export function getLocalizedCountryName(countryName: string, locale: string): st
  * @param locale 目标语言
  * @returns 本地化后的国家列表
  */
-export function getLocalizedCountries<T extends { name: string }>(
+export function getLocalizedCountries<T extends { name: string; code?: string }>(
   countries: T[], 
   locale: string
 ): (T & { localizedName: string })[] {
-  return countries.map(country => ({
-    ...country,
-    localizedName: getLocalizedCountryName(country.name, locale)
-  }))
+  return countries.map(country => {
+    // 如果有code字段，直接使用
+    if (country.code && typeof Intl !== 'undefined' && Intl.DisplayNames) {
+      try {
+        const displayNames = new Intl.DisplayNames([locale], { type: 'region' })
+        const localizedName = displayNames.of(country.code.toUpperCase())
+        if (localizedName && localizedName !== country.code.toUpperCase()) {
+          return {
+            ...country,
+            localizedName
+          }
+        }
+      } catch (error) {
+        console.warn('Direct code translation failed:', country.code, error)
+      }
+    }
+    
+    // 否则使用原来的方法
+    return {
+      ...country,
+      localizedName: getLocalizedCountryName(country.name, locale)
+    }
+  })
 }
