@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { AlertTriangle, Home, List, Settings } from 'lucide-react'
+import { AlertTriangle, Home, List } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/language-switcher'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {

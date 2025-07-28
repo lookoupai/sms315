@@ -19,7 +19,7 @@ const GuideListPage = () => {
   const [websites, setWebsites] = useState<Website[]>([])
   const [countries, setCountries] = useState<Country[]>([])
   const [localizedCountries, setLocalizedCountries] = useState<(Country & { localizedName: string })[]>([])
-  const [projects, setProjects] = useState<Project[]>([])
+  const [, setProjects] = useState<Project[]>([])
   const [filters, setFilters] = useState({
     search: '',
     result: 'all',
@@ -33,7 +33,7 @@ const GuideListPage = () => {
   // 分页状态
   const [currentPage, setCurrentPage] = useState(1)
   const [totalItems, setTotalItems] = useState(0)
-  const [hasMore, setHasMore] = useState(false)
+  const [, setHasMore] = useState(false)
   const pageSize = 20
 
   // 加载基础数据（网站、国家、项目列表）
