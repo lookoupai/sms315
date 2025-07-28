@@ -99,6 +99,8 @@ const countryNameToCode: Record<string, string> = {
   '黑山': 'ME',
   '北马其顿': 'MK',
   '阿尔巴尼亚': 'AL',
+  '不丹': 'BT',
+  '东帝汶': 'TL',
   
   // 英文名称到ISO代码
   'China': 'CN',
@@ -193,7 +195,10 @@ const countryNameToCode: Record<string, string> = {
   'Bosnia and Herzegovina': 'BA',
   'Montenegro': 'ME',
   'North Macedonia': 'MK',
-  'Albania': 'AL'
+  'Albania': 'AL',
+  'Bhutan': 'BT',
+  'East Timor': 'TL',
+  'Timor-Leste': 'TL'
 }
 
 // ISO代码到常见名称的反向映射（用于fallback）
@@ -215,7 +220,11 @@ const codeToCommonName: Record<string, { zh: string; en: string }> = {
   'PH': { zh: '菲律宾', en: 'Philippines' },
   'VN': { zh: '越南', en: 'Vietnam' },
   'RU': { zh: '俄罗斯', en: 'Russia' },
-  'BR': { zh: '巴西', en: 'Brazil' }
+  'BR': { zh: '巴西', en: 'Brazil' },
+  'BT': { zh: '不丹', en: 'Bhutan' },
+  'TL': { zh: '东帝汶', en: 'East Timor' },
+  'DK': { zh: '丹麦', en: 'Denmark' },
+  'UA': { zh: '乌克兰', en: 'Ukraine' }
   // 可以继续添加更多常用国家
 }
 
