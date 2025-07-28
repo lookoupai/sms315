@@ -9,14 +9,16 @@ import { AlertTriangle, CheckCircle, Search, Filter, Clock, ExternalLink, Refres
 import { getSubmissions, getWebsites, getCountries, getProjects } from '../services/database'
 import { Pagination } from '../components/pagination'
 import { SearchableSelect } from '../components/searchable-select'
+import { getLocalizedCountries } from '../utils/country-names'
 import type { Submission, Website, Country, Project } from '../lib/supabase'
 
 const GuideListPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([])
   const [websites, setWebsites] = useState<Website[]>([])
   const [countries, setCountries] = useState<Country[]>([])
+  const [localizedCountries, setLocalizedCountries] = useState<(Country & { localizedName: string })[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [filters, setFilters] = useState({
     search: '',
@@ -52,6 +54,14 @@ const GuideListPage = () => {
     }
     loadBasicData()
   }, [])
+
+  // 当语言或国家数据变化时，更新本地化的国家列表
+  useEffect(() => {
+    if (countries.length > 0) {
+      const localized = getLocalizedCountries(countries, i18n.language)
+      setLocalizedCountries(localized)
+    }
+  }, [countries, i18n.language])
 
   // 加载提交记录
   const loadSubmissions = useCallback(async (page: number = 1, showLoading: boolean = true) => {
@@ -269,9 +279,9 @@ const GuideListPage = () => {
               <SearchableSelect
                 options={[
                   { value: 'all', label: t('guide.allCountries') },
-                  ...countries.map(country => ({
+                  ...localizedCountries.map(country => ({
                     value: country.name,
-                    label: `${country.name} ${country.code ? `(${country.code})` : ''}`
+                    label: `${country.localizedName} ${country.code ? `(${country.code})` : ''}`
                   }))
                 ]}
                 value={filters.country}
@@ -341,7 +351,12 @@ const GuideListPage = () => {
                       <div>
                         <span className="font-medium text-gray-700">{t('guide.countryLabel')}</span>
                         <div className="mt-1">
-                          <span>{submission.country?.name || t('guide.unknownCountry')}</span>
+                          <span>
+                            {submission.country 
+                              ? localizedCountries.find(c => c.id === submission.country?.id)?.localizedName || submission.country.name
+                              : t('guide.unknownCountry')
+                            }
+                          </span>
                           {submission.country?.code && (
                             <span className="text-gray-500"> ({submission.country.code})</span>
                           )}

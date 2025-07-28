@@ -7,6 +7,7 @@ import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
 import { AlertTriangle, Heart, Send, CheckCircle, XCircle, Loader2, ChevronDown, Search, X } from 'lucide-react'
 import { getWebsites, getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
+import { getLocalizedCountries } from '../utils/country-names'
 import type { Website, Country, Project } from '../lib/supabase'
 import SearchableCountrySelect from '../components/SearchableCountrySelect'
 
@@ -268,9 +269,10 @@ function InlineSearchableProjectSelect({
 }
 
 export default function SubmitPageNew() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [websites, setWebsites] = useState<Website[]>([])
   const [countries, setCountries] = useState<Country[]>([])
+  const [localizedCountries, setLocalizedCountries] = useState<(Country & { localizedName: string })[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -294,6 +296,14 @@ export default function SubmitPageNew() {
   useEffect(() => {
     loadData()
   }, [])
+
+  // 当语言或国家数据变化时，更新本地化的国家列表
+  useEffect(() => {
+    if (countries.length > 0) {
+      const localized = getLocalizedCountries(countries, i18n.language)
+      setLocalizedCountries(localized)
+    }
+  }, [countries, i18n.language])
 
   const loadData = async () => {
     setLoading(true)
@@ -477,7 +487,10 @@ export default function SubmitPageNew() {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1 min-w-0">
                     <SearchableCountrySelect
-                      countries={countries}
+                      countries={localizedCountries.map(country => ({
+                        ...country,
+                        name: country.localizedName
+                      }))}
                       value={selectedCountry === 'custom' ? '' : selectedCountry}
                       onValueChange={setSelectedCountry}
                       placeholder={t('submit.countryPlaceholder')}
