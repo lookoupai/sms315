@@ -48,16 +48,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   <span className="sm:hidden">{t('nav.submitShort')}</span>
                 </Link>
               </Button>
+              {/* 管理后台按钮 - 仅在桌面端显示 */}
               <Button
                 variant={location.pathname.startsWith('/admin') ? 'default' : 'ghost'}
                 asChild
-                className="px-3 py-2 h-9 text-sm"
+                className="hidden md:flex px-3 py-2 h-9 text-sm"
                 size="sm"
               >
                 <Link to="/admin" className="flex items-center space-x-1">
                   <Settings className="h-4 w-4" />
-                  <span className="hidden sm:inline">{t('nav.admin')}</span>
-                  <span className="sm:hidden">{t('nav.adminShort')}</span>
+                  <span>{t('nav.admin')}</span>
                 </Link>
               </Button>
               <LanguageSwitcher />
