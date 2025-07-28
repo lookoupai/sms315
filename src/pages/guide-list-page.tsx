@@ -1,16 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-// import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { AlertTriangle, CheckCircle, Search, Filter, Clock, ExternalLink } from 'lucide-react'
-import { getSubmissions } from '../services/database'
-import type { Submission } from '../lib/supabase'
+import { AlertTriangle, CheckCircle, Search, Filter, Clock, ExternalLink, RefreshCw } from 'lucide-react'
+import { getSubmissions, getWebsites, getCountries, getProjects } from '../services/database'
+import { Pagination } from '../components/pagination'
+import type { Submission, Website, Country, Project } from '../lib/supabase'
 
 const GuideListPage = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([])
+  const [websites, setWebsites] = useState<Website[]>([])
+  const [countries, setCountries] = useState<Country[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
   const [filters, setFilters] = useState({
     search: '',
     result: 'all',
@@ -19,22 +23,67 @@ const GuideListPage = () => {
     project: 'all'
   })
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalItems, setTotalItems] = useState(0)
+  const [hasMore, setHasMore] = useState(false)
+  const pageSize = 20
 
+  // 加载基础数据（网站、国家、项目列表）
   useEffect(() => {
-    const loadSubmissions = async () => {
+    const loadBasicData = async () => {
       try {
-        const data = await getSubmissions()
-        setSubmissions(data)
+        const [websitesData, countriesData, projectsData] = await Promise.all([
+          getWebsites(),
+          getCountries(),
+          getProjects()
+        ])
+        setWebsites(websitesData)
+        setCountries(countriesData)
+        setProjects(projectsData)
       } catch (error) {
-        console.error('加载提交记录失败:', error)
-      } finally {
-        setLoading(false)
+        console.error('加载基础数据失败:', error)
       }
     }
-
-    loadSubmissions()
+    loadBasicData()
   }, [])
 
+  // 加载提交记录
+  const loadSubmissions = useCallback(async (page: number = 1, showLoading: boolean = true) => {
+    if (showLoading) {
+      setLoading(true)
+    } else {
+      setRefreshing(true)
+    }
+
+    try {
+      const result = await getSubmissions(page, pageSize, {
+        result: filters.result as 'all' | 'success' | 'failure',
+        website: filters.website === 'all' ? undefined : filters.website,
+        country: filters.country === 'all' ? undefined : filters.country,
+        project: filters.project === 'all' ? undefined : filters.project
+      })
+      
+      setSubmissions(result.data)
+      setTotalItems(result.total)
+      setHasMore(result.hasMore)
+      setCurrentPage(page)
+    } catch (error) {
+      console.error('加载提交记录失败:', error)
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }, [filters])
+
+  // 初始加载
+  useEffect(() => {
+    loadSubmissions(1, true)
+  }, [loadSubmissions])
+
+  // 前端搜索筛选（因为涉及关联表的文本搜索）
   useEffect(() => {
     let filtered = submissions
 
@@ -50,35 +99,30 @@ const GuideListPage = () => {
       )
     }
 
-    // 结果过滤
-    if (filters.result !== 'all') {
-      filtered = filtered.filter(item => item.result === filters.result)
-    }
-
-    // 网站过滤
-    if (filters.website !== 'all') {
-      filtered = filtered.filter(item => item.website?.name === filters.website)
-    }
-
-    // 国家过滤
-    if (filters.country !== 'all') {
-      filtered = filtered.filter(item => item.country?.name === filters.country)
-    }
-
-    // 项目过滤
-    if (filters.project !== 'all') {
-      filtered = filtered.filter(item => item.project?.name === filters.project)
-    }
-
-    // 按结果排序：失败记录优先
-    filtered.sort((a, b) => {
-      if (a.result === 'failure' && b.result === 'success') return -1
-      if (a.result === 'success' && b.result === 'failure') return 1
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    })
-
     setFilteredSubmissions(filtered)
-  }, [submissions, filters])
+  }, [submissions, filters.search])
+
+  // 处理筛选器变化
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }))
+    // 重置到第一页
+    if (key !== 'search') {
+      setCurrentPage(1)
+      loadSubmissions(1, false)
+    }
+  }
+
+  // 处理页面变化
+  const handlePageChange = (page: number) => {
+    loadSubmissions(page, false)
+    // 滚动到顶部
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // 刷新数据
+  const handleRefresh = () => {
+    loadSubmissions(currentPage, false)
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -91,18 +135,9 @@ const GuideListPage = () => {
     return date.toLocaleDateString('zh-CN')
   }
 
-  const getUniqueValues = (key: string) => {
-    const values = submissions.map(item => {
-      if (key === 'website') return item.website?.name
-      if (key === 'country') return item.country?.name
-      if (key === 'project') return item.project?.name
-      return ''
-    })
-    return [...new Set(values)].filter(Boolean)
-  }
-
   const failureCount = filteredSubmissions.filter(item => item.result === 'failure').length
   const successCount = filteredSubmissions.filter(item => item.result === 'success').length
+  const totalPages = Math.ceil(totalItems / pageSize)
 
   if (loading) {
     return (
@@ -155,7 +190,7 @@ const GuideListPage = () => {
             <div className="flex flex-col md:flex-row items-center md:space-x-2 text-center md:text-left">
               <Clock className="h-4 w-4 md:h-5 md:w-5 text-blue-500 mb-1 md:mb-0" />
               <div>
-                <p className="text-lg md:text-2xl font-bold text-blue-600">{filteredSubmissions.length}</p>
+                <p className="text-lg md:text-2xl font-bold text-blue-600">{totalItems}</p>
                 <p className="text-xs md:text-sm text-gray-600">总记录数</p>
               </div>
             </div>
@@ -166,13 +201,25 @@ const GuideListPage = () => {
       {/* 筛选器 */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Filter className="h-5 w-5" />
-            <span>筛选条件</span>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Filter className="h-5 w-5" />
+              <span>筛选条件</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="flex items-center space-x-1"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">刷新</span>
+            </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">搜索</label>
               <div className="relative">
@@ -180,14 +227,14 @@ const GuideListPage = () => {
                 <Input
                   placeholder="搜索网站、国家、区号、项目..."
                   value={filters.search}
-                  onChange={(e) => setFilters({...filters, search: e.target.value})}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
                   className="pl-10 min-h-[44px]"
                 />
               </div>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">结果类型</label>
-              <Select value={filters.result} onValueChange={(value) => setFilters({...filters, result: value})}>
+              <Select value={filters.result} onValueChange={(value) => handleFilterChange('result', value)}>
                 <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
@@ -200,14 +247,28 @@ const GuideListPage = () => {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">网站</label>
-              <Select value={filters.website} onValueChange={(value) => setFilters({...filters, website: value})}>
+              <Select value={filters.website} onValueChange={(value) => handleFilterChange('website', value)}>
                 <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">全部网站</SelectItem>
-                  {getUniqueValues('website').map(website => (
-                    <SelectItem key={website} value={website || ''}>{website}</SelectItem>
+                  {websites.map(website => (
+                    <SelectItem key={website.id} value={website.name}>{website.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">国家</label>
+              <Select value={filters.country} onValueChange={(value) => handleFilterChange('country', value)}>
+                <SelectTrigger className="min-h-[44px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">全部国家</SelectItem>
+                  {countries.map(country => (
+                    <SelectItem key={country.id} value={country.name}>{country.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -303,6 +364,19 @@ const GuideListPage = () => {
           ))
         )}
       </div>
+
+      {/* 分页组件 */}
+      {totalPages > 1 && (
+        <div className="mt-8">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={totalItems}
+            itemsPerPage={pageSize}
+          />
+        </div>
+      )}
     </div>
   )
 }

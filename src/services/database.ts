@@ -47,8 +47,59 @@ export async function getProjects(): Promise<Project[]> {
   return data || []
 }
 
-// 获取提交记录（带关联数据）
-export async function getSubmissions(): Promise<Submission[]> {
+// 获取提交记录（带关联数据和分页）
+export async function getSubmissions(
+  page: number = 1,
+  pageSize: number = 20,
+  filters?: {
+    search?: string
+    result?: 'all' | 'success' | 'failure'
+    website?: string
+    country?: string
+    project?: string
+  }
+): Promise<{ data: Submission[]; total: number; hasMore: boolean }> {
+  let query = supabase
+    .from('submissions')
+    .select(`
+      *,
+      website:websites(*),
+      country:countries(*),
+      project:projects(*)
+    `, { count: 'exact' })
+
+  // 应用筛选条件
+  if (filters?.result && filters.result !== 'all') {
+    query = query.eq('result', filters.result)
+  }
+
+  // 搜索功能需要在前端处理，因为涉及关联表的文本搜索
+  // 这里先获取数据，然后在前端进行搜索筛选
+
+  const offset = (page - 1) * pageSize
+  
+  const { data, error, count } = await query
+    .order('result', { ascending: true }) // 失败记录优先
+    .order('created_at', { ascending: false })
+    .range(offset, offset + pageSize - 1)
+  
+  if (error) {
+    console.error('获取提交记录失败:', error)
+    return { data: [], total: 0, hasMore: false }
+  }
+  
+  const total = count || 0
+  const hasMore = offset + pageSize < total
+  
+  return { 
+    data: data || [], 
+    total,
+    hasMore
+  }
+}
+
+// 保留原有的简单获取函数，用于向后兼容
+export async function getAllSubmissions(): Promise<Submission[]> {
   const { data, error } = await supabase
     .from('submissions')
     .select(`
