@@ -229,6 +229,21 @@ const codeToCommonName: Record<string, { zh: string; en: string }> = {
 }
 
 /**
+ * 从国家名称中提取ISO代码
+ * 支持格式：国家名 (code) 或 直接的国家名
+ */
+function extractCountryCode(countryName: string): string | null {
+  // 匹配括号中的代码，如 "中国 (cn)" -> "cn"
+  const codeMatch = countryName.match(/\(([a-zA-Z]{2})\)$/)
+  if (codeMatch) {
+    return codeMatch[1].toUpperCase()
+  }
+  
+  // 尝试从映射表获取
+  return countryNameToCode[countryName] || null
+}
+
+/**
  * 获取国际化的国家名称
  * @param countryName 原始国家名称
  * @param locale 目标语言 ('zh-CN' | 'en-US')
@@ -238,11 +253,16 @@ export function getLocalizedCountryName(countryName: string, locale: string): st
   if (!countryName) return countryName
 
   try {
-    // 1. 尝试从映射表获取ISO代码
-    const countryCode = countryNameToCode[countryName]
+    // 1. 提取国家代码
+    let countryCode = extractCountryCode(countryName)
+    
+    // 2. 如果没有找到代码，尝试从映射表获取
+    if (!countryCode) {
+      countryCode = countryNameToCode[countryName]
+    }
     
     if (countryCode) {
-      // 2. 使用浏览器原生API获取本地化名称
+      // 3. 使用浏览器原生API获取本地化名称
       if (typeof Intl !== 'undefined' && Intl.DisplayNames) {
         try {
           const displayNames = new Intl.DisplayNames([locale], { type: 'region' })
@@ -251,19 +271,19 @@ export function getLocalizedCountryName(countryName: string, locale: string): st
             return localizedName
           }
         } catch (error) {
-          console.warn('Intl.DisplayNames failed:', error)
+          console.warn('Intl.DisplayNames failed for code:', countryCode, error)
         }
       }
       
-      // 3. Fallback到预定义的常见名称
+      // 4. Fallback到预定义的常见名称
       const commonName = codeToCommonName[countryCode]
       if (commonName) {
         return locale.startsWith('zh') ? commonName.zh : commonName.en
       }
     }
     
-    // 4. 如果都失败了，返回原始名称
-    return countryName
+    // 5. 如果都失败了，返回原始名称（去掉括号中的代码）
+    return countryName.replace(/\s*\([a-zA-Z]{2}\)$/, '')
   } catch (error) {
     console.warn('Country name localization failed:', error)
     return countryName
