@@ -387,43 +387,41 @@ export default function SubmitPageNew() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-4 md:py-8">
       <div className="max-w-2xl mx-auto px-4">
 
-        {/* 页面标题 */}
         {/* 页面标题 - 移动端优化 */}
-        <div className="text-center mb-6 md:mb-8">
-          <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
-            <Heart className="h-6 w-6 md:h-8 md:w-8 text-red-500" />
-            <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <div className="text-center mb-4 md:mb-8">
+          <div className="flex items-center justify-center gap-2 md:gap-3 mb-2 md:mb-4">
+            <Heart className="h-5 w-5 md:h-8 md:w-8 text-red-500 flex-shrink-0" />
+            <h1 className="text-xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-tight">
               {t('submit.title')}
             </h1>
           </div>
-          <p className="text-gray-600 text-sm md:text-lg px-4">
+          <p className="text-gray-600 text-sm md:text-lg px-2 md:px-4">
             {t('submit.subtitle')}
           </p>
         </div>
 
-        {/* 提交表单 */}
         {/* 提交表单 - 移动端优化 */}
         <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
-              <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-orange-500" />
-              {t('submit.formTitle')}
+          <CardHeader className="pb-3 md:pb-4 px-4 md:px-6 pt-4 md:pt-6">
+            <CardTitle className="flex items-center gap-2 text-base md:text-xl">
+              <AlertTriangle className="h-4 w-4 md:h-6 md:w-6 text-orange-500 flex-shrink-0" />
+              <span className="leading-tight">{t('submit.formTitle')}</span>
             </CardTitle>
-            <CardDescription className="text-sm md:text-base">
+            <CardDescription className="text-xs md:text-base text-gray-600 leading-relaxed">
               {t('submit.formDescription')}
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-4 md:p-6">
+          <CardContent className="p-4 md:p-6 pt-2 md:pt-4">
             <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
               {/* 网站选择 */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">
+              <div className="space-y-2 md:space-y-3">
+                <Label className="text-sm font-medium block">
                   {t('submit.websiteLabel')} <span className="text-red-500">{t('submit.required')}</span>
-                  <span className="text-xs text-blue-600 ml-2">{t('submit.websiteSearchHint')}</span>
+                  <span className="text-xs text-blue-600 ml-1 md:ml-2">{t('submit.websiteSearchHint')}</span>
                 </Label>
                 
-                <div className="flex gap-2">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1 min-w-0">
                     <InlineSearchableWebsiteSelect
                       websites={websites}
                       value={selectedWebsite === 'custom' ? '' : selectedWebsite}
@@ -435,7 +433,7 @@ export default function SubmitPageNew() {
                     type="button"
                     variant="outline"
                     onClick={() => setSelectedWebsite(selectedWebsite === 'custom' ? '' : 'custom')}
-                    className={`px-4 whitespace-nowrap ${
+                    className={`px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${
                       selectedWebsite === 'custom' 
                         ? 'bg-blue-100 border-blue-300 text-blue-700' 
                         : 'hover:bg-blue-50'
@@ -470,14 +468,14 @@ export default function SubmitPageNew() {
               </div>
 
               {/* 国家选择 */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">
+              <div className="space-y-2 md:space-y-3">
+                <Label className="text-sm font-medium block">
                   {t('submit.countryLabel')} <span className="text-red-500">{t('submit.required')}</span>
-                  <span className="text-xs text-green-600 ml-2">{t('submit.countrySearchHint')}</span>
+                  <span className="text-xs text-green-600 ml-1 md:ml-2">{t('submit.countrySearchHint')}</span>
                 </Label>
                 
-                <div className="flex gap-2">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1 min-w-0">
                     <SearchableCountrySelect
                       countries={countries}
                       value={selectedCountry === 'custom' ? '' : selectedCountry}
@@ -489,7 +487,7 @@ export default function SubmitPageNew() {
                     type="button"
                     variant="outline"
                     onClick={() => setSelectedCountry(selectedCountry === 'custom' ? '' : 'custom')}
-                    className={`px-4 whitespace-nowrap ${
+                    className={`px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${
                       selectedCountry === 'custom' 
                         ? 'bg-green-100 border-green-300 text-green-700' 
                         : 'hover:bg-green-50'
@@ -530,14 +528,14 @@ export default function SubmitPageNew() {
               </div>
 
               {/* 项目选择 */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">
+              <div className="space-y-2 md:space-y-3">
+                <Label className="text-sm font-medium block">
                   {t('submit.projectLabel')} <span className="text-red-500">{t('submit.required')}</span>
-                  <span className="text-xs text-purple-600 ml-2">{t('submit.projectSearchHint')}</span>
+                  <span className="text-xs text-purple-600 ml-1 md:ml-2">{t('submit.projectSearchHint')}</span>
                 </Label>
                 
-                <div className="flex gap-2">
-                  <div className="flex-1">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1 min-w-0">
                     <InlineSearchableProjectSelect
                       projects={projects}
                       value={selectedProject === 'custom' ? '' : selectedProject}
@@ -549,7 +547,7 @@ export default function SubmitPageNew() {
                     type="button"
                     variant="outline"
                     onClick={() => setSelectedProject(selectedProject === 'custom' ? '' : 'custom')}
-                    className={`px-4 whitespace-nowrap ${
+                    className={`px-3 sm:px-4 text-xs sm:text-sm whitespace-nowrap flex-shrink-0 ${
                       selectedProject === 'custom' 
                         ? 'bg-purple-100 border-purple-300 text-purple-700' 
                         : 'hover:bg-purple-50'
@@ -584,43 +582,43 @@ export default function SubmitPageNew() {
               </div>
 
               {/* 结果选择 */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">
+              <div className="space-y-2 md:space-y-3">
+                <Label className="text-sm font-medium block">
                   {t('submit.resultLabel')} <span className="text-red-500">{t('submit.required')}</span>
                 </Label>
-                <div className="grid grid-cols-1 gap-3">
-                  <label className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-red-50 transition-colors border-red-200 bg-red-50/50">
+                <div className="grid grid-cols-1 gap-2 md:gap-3">
+                  <label className="flex items-center space-x-3 p-3 md:p-4 border-2 rounded-lg cursor-pointer hover:bg-red-50 transition-colors border-red-200 bg-red-50/50">
                     <input
                       type="radio"
                       name="result"
                       value="failure"
                       checked={result === 'failure'}
                       onChange={(e) => setResult(e.target.value as 'failure')}
-                      className="w-4 h-4 text-red-600"
+                      className="w-4 h-4 text-red-600 flex-shrink-0"
                     />
-                    <div className="flex items-center gap-2">
-                      <XCircle className="h-5 w-5 text-red-500" />
-                      <div>
-                        <div className="font-medium text-red-700">{t('submit.failureResult')}</div>
-                        <div className="text-sm text-red-600">{t('submit.failureResultDesc')}</div>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <XCircle className="h-4 w-4 md:h-5 md:w-5 text-red-500 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <div className="font-medium text-red-700 text-sm md:text-base">{t('submit.failureResult')}</div>
+                        <div className="text-xs md:text-sm text-red-600">{t('submit.failureResultDesc')}</div>
                       </div>
                     </div>
                   </label>
                   
-                  <label className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition-colors border-green-200 bg-green-50/50">
+                  <label className="flex items-center space-x-3 p-3 md:p-4 border-2 rounded-lg cursor-pointer hover:bg-green-50 transition-colors border-green-200 bg-green-50/50">
                     <input
                       type="radio"
                       name="result"
                       value="success"
                       checked={result === 'success'}
                       onChange={(e) => setResult(e.target.value as 'success')}
-                      className="w-4 h-4 text-green-600"
+                      className="w-4 h-4 text-green-600 flex-shrink-0"
                     />
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                      <div>
-                        <div className="font-medium text-green-700">{t('submit.successResult')}</div>
-                        <div className="text-sm text-green-600">{t('submit.successResultDesc')}</div>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <div className="font-medium text-green-700 text-sm md:text-base">{t('submit.successResult')}</div>
+                        <div className="text-xs md:text-sm text-green-600">{t('submit.successResultDesc')}</div>
                       </div>
                     </div>
                   </label>
@@ -665,22 +663,21 @@ export default function SubmitPageNew() {
                 </div>
               )}
 
-              {/* 提交按钮 */}
               {/* 提交按钮 - 移动端优化 */}
-          <Button 
-            type="submit" 
-            disabled={submitting}
-            className="btn-primary w-full py-3 px-6 text-lg flex items-center justify-center gap-2"
-          >
+              <Button 
+                type="submit" 
+                disabled={submitting}
+                className="btn-primary w-full py-3 md:py-4 px-4 md:px-6 text-base md:text-lg flex items-center justify-center gap-2 font-medium"
+              >
                 {submitting ? (
                   <>
-                    <Loader2 className="h-4 w-4 md:h-5 md:w-5 mr-2 animate-spin" />
-                    {t('submit.submitting')}
+                    <Loader2 className="h-4 w-4 md:h-5 md:w-5 animate-spin" />
+                    <span>{t('submit.submitting')}</span>
                   </>
                 ) : (
                   <>
-                    <Send className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                    {t('submit.submitShare')}
+                    <Send className="h-4 w-4 md:h-5 md:w-5" />
+                    <span>{t('submit.submitShare')}</span>
                   </>
                 )}
               </Button>
