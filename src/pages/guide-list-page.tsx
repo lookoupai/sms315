@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { AlertTriangle, CheckCircle, Search, Filter, Clock, ExternalLink, RefreshCw } from 'lucide-react'
 import { getSubmissions, getWebsites, getCountries, getProjects } from '../services/database'
 import { Pagination } from '../components/pagination'
+import { SearchableSelect } from '../components/searchable-select'
 import type { Submission, Website, Country, Project } from '../lib/supabase'
 
 const GuideListPage = () => {
@@ -249,31 +250,35 @@ const GuideListPage = () => {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">{t('guide.website')}</label>
-              <Select value={filters.website} onValueChange={(value) => handleFilterChange('website', value)}>
-                <SelectTrigger className="min-h-[44px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('guide.allWebsites')}</SelectItem>
-                  {websites.map(website => (
-                    <SelectItem key={website.id} value={website.name}>{website.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={[
+                  { value: 'all', label: t('guide.allWebsites') },
+                  ...websites.map(website => ({
+                    value: website.name,
+                    label: website.name
+                  }))
+                ]}
+                value={filters.website}
+                onValueChange={(value) => handleFilterChange('website', value)}
+                placeholder={t('guide.allWebsites')}
+                searchPlaceholder={t('guide.searchWebsites')}
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">{t('guide.country')}</label>
-              <Select value={filters.country} onValueChange={(value) => handleFilterChange('country', value)}>
-                <SelectTrigger className="min-h-[44px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('guide.allCountries')}</SelectItem>
-                  {countries.map(country => (
-                    <SelectItem key={country.id} value={country.name}>{country.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                options={[
+                  { value: 'all', label: t('guide.allCountries') },
+                  ...countries.map(country => ({
+                    value: country.name,
+                    label: `${country.name} ${country.code ? `(${country.code})` : ''}`
+                  }))
+                ]}
+                value={filters.country}
+                onValueChange={(value) => handleFilterChange('country', value)}
+                placeholder={t('guide.allCountries')}
+                searchPlaceholder={t('guide.searchCountries')}
+              />
             </div>
           </div>
         </CardContent>
