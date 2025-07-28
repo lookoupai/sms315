@@ -101,6 +101,12 @@ const countryNameToCode: Record<string, string> = {
   '阿尔巴尼亚': 'AL',
   '不丹': 'BT',
   '东帝汶': 'TL',
+  '乌干达': 'UG',
+  '乌拉圭': 'UY',
+  '几内亚比绍': 'GW',
+  '刚果': 'CG',
+  '利比里亚': 'LR',
+  '加纳': 'GH',
   
   // 英文名称到ISO代码
   'China': 'CN',
@@ -198,7 +204,13 @@ const countryNameToCode: Record<string, string> = {
   'Albania': 'AL',
   'Bhutan': 'BT',
   'East Timor': 'TL',
-  'Timor-Leste': 'TL'
+  'Timor-Leste': 'TL',
+  'Uganda': 'UG',
+  'Uruguay': 'UY',
+  'Guinea-Bissau': 'GW',
+  'Congo': 'CG',
+  'Liberia': 'LR',
+  'Ghana': 'GH'
 }
 
 // ISO代码到常见名称的反向映射（用于fallback）
@@ -236,19 +248,11 @@ function extractCountryCode(countryName: string): string | null {
   // 匹配括号中的代码，如 "中国 (cn)" -> "cn"
   const codeMatch = countryName.match(/\(([a-zA-Z]{2})\)$/)
   if (codeMatch) {
-    console.log('Extracted code from brackets:', codeMatch[1].toUpperCase())
     return codeMatch[1].toUpperCase()
   }
   
   // 尝试从映射表获取
-  const mappedCode = countryNameToCode[countryName]
-  if (mappedCode) {
-    console.log('Found code in mapping:', mappedCode)
-    return mappedCode
-  }
-  
-  console.log('No code found for:', countryName)
-  return null
+  return countryNameToCode[countryName] || null
 }
 
 /**
@@ -260,14 +264,9 @@ function extractCountryCode(countryName: string): string | null {
 export function getLocalizedCountryName(countryName: string, locale: string): string {
   if (!countryName) return countryName
 
-  console.log('=== Country Localization Debug ===')
-  console.log('Input:', { countryName, locale })
-
   try {
     // 1. 提取国家代码
     let countryCode = extractCountryCode(countryName)
-    
-    console.log('Extracted country code:', countryCode)
     
     if (countryCode) {
       // 2. 使用浏览器原生API获取本地化名称
@@ -275,32 +274,26 @@ export function getLocalizedCountryName(countryName: string, locale: string): st
         try {
           const displayNames = new Intl.DisplayNames([locale], { type: 'region' })
           const localizedName = displayNames.of(countryCode)
-          console.log('Intl.DisplayNames result:', { code: countryCode, result: localizedName })
           
           if (localizedName && localizedName !== countryCode) {
-            console.log('✅ Using Intl.DisplayNames result:', localizedName)
             return localizedName
           }
         } catch (error) {
-          console.warn('❌ Intl.DisplayNames failed for code:', countryCode, error)
+          console.warn('Intl.DisplayNames failed for code:', countryCode, error)
         }
       }
       
       // 3. Fallback到预定义的常见名称
       const commonName = codeToCommonName[countryCode]
       if (commonName) {
-        const result = locale.startsWith('zh') ? commonName.zh : commonName.en
-        console.log('✅ Using fallback mapping:', result)
-        return result
+        return locale.startsWith('zh') ? commonName.zh : commonName.en
       }
     }
     
     // 4. 如果都失败了，返回原始名称（去掉括号中的代码）
-    const result = countryName.replace(/\s*\([a-zA-Z]{2}\)$/, '')
-    console.log('⚠️ Using original name (cleaned):', result)
-    return result
+    return countryName.replace(/\s*\([a-zA-Z]{2}\)$/, '')
   } catch (error) {
-    console.error('❌ Country name localization failed:', error)
+    console.warn('Country name localization failed:', error)
     return countryName
   }
 }
