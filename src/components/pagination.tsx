@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface PaginationProps {
   currentPage: number
@@ -18,6 +19,7 @@ export function Pagination({
   totalItems = 0,
   itemsPerPage = 20
 }: PaginationProps) {
+  const { t } = useTranslation()
   const startItem = (currentPage - 1) * itemsPerPage + 1
   const endItem = Math.min(currentPage * itemsPerPage, totalItems)
 
@@ -70,9 +72,9 @@ export function Pagination({
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-2">
       {showInfo && (
         <div className="text-sm text-gray-700 order-2 sm:order-1">
-          显示第 <span className="font-medium">{startItem}</span> 到{' '}
-          <span className="font-medium">{endItem}</span> 条，共{' '}
-          <span className="font-medium">{totalItems}</span> 条记录
+          {t('pagination.showing')} <span className="font-medium">{startItem}</span> {t('pagination.to')}{' '}
+          <span className="font-medium">{endItem}</span> {t('pagination.of')}{' '}
+          <span className="font-medium">{totalItems}</span> {t('pagination.records')}
         </div>
       )}
       
@@ -96,7 +98,7 @@ export function Pagination({
           disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
-          <span className="hidden sm:inline ml-1">上一页</span>
+          <span className="hidden sm:inline ml-1">{t('pagination.previous')}</span>
         </Button>
 
         {/* 页码 */}
@@ -126,7 +128,7 @@ export function Pagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
-          <span className="hidden sm:inline mr-1">下一页</span>
+          <span className="hidden sm:inline mr-1">{t('pagination.next')}</span>
           <ChevronRight className="h-4 w-4" />
         </Button>
 

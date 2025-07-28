@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,6 +11,7 @@ import { Pagination } from '../components/pagination'
 import type { Submission, Website, Country, Project } from '../lib/supabase'
 
 const GuideListPage = () => {
+  const { t } = useTranslation()
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([])
   const [websites, setWebsites] = useState<Website[]>([])
@@ -144,7 +146,7 @@ const GuideListPage = () => {
       <div className="flex items-center justify-center min-h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2 text-gray-600">加载中...</p>
+          <p className="mt-2 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     )
@@ -156,9 +158,9 @@ const GuideListPage = () => {
       <div className="text-center space-y-2 mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center space-x-2">
           <AlertTriangle className="h-6 w-6 md:h-8 md:w-8 text-red-500" />
-          <span>接码避坑指南</span>
+          <span>{t('guide.title')}</span>
         </h1>
-        <p className="text-gray-600 text-sm md:text-base px-4">查看最新的接码失败记录，避免重复踩坑</p>
+        <p className="text-gray-600 text-sm md:text-base px-4">{t('guide.subtitle')}</p>
       </div>
 
       {/* 统计信息 - 移动端优化 */}
@@ -169,7 +171,7 @@ const GuideListPage = () => {
               <AlertTriangle className="h-4 w-4 md:h-5 md:w-5 text-red-500 mb-1 md:mb-0" />
               <div>
                 <p className="text-lg md:text-2xl font-bold text-red-600">{failureCount}</p>
-                <p className="text-xs md:text-sm text-gray-600">失败记录</p>
+                <p className="text-xs md:text-sm text-gray-600">{t('guide.failureRecords')}</p>
               </div>
             </div>
           </CardContent>
@@ -180,7 +182,7 @@ const GuideListPage = () => {
               <CheckCircle className="h-4 w-4 md:h-5 md:w-5 text-green-500 mb-1 md:mb-0" />
               <div>
                 <p className="text-lg md:text-2xl font-bold text-green-600">{successCount}</p>
-                <p className="text-xs md:text-sm text-gray-600">成功记录</p>
+                <p className="text-xs md:text-sm text-gray-600">{t('guide.successRecords')}</p>
               </div>
             </div>
           </CardContent>
@@ -191,7 +193,7 @@ const GuideListPage = () => {
               <Clock className="h-4 w-4 md:h-5 md:w-5 text-blue-500 mb-1 md:mb-0" />
               <div>
                 <p className="text-lg md:text-2xl font-bold text-blue-600">{totalItems}</p>
-                <p className="text-xs md:text-sm text-gray-600">总记录数</p>
+                <p className="text-xs md:text-sm text-gray-600">{t('guide.totalRecords')}</p>
               </div>
             </div>
           </CardContent>
@@ -204,7 +206,7 @@ const GuideListPage = () => {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Filter className="h-5 w-5" />
-              <span>筛选条件</span>
+              <span>{t('guide.filterConditions')}</span>
             </div>
             <Button
               variant="outline"
@@ -214,18 +216,18 @@ const GuideListPage = () => {
               className="flex items-center space-x-1"
             >
               <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">刷新</span>
+              <span className="hidden sm:inline">{t('common.refresh')}</span>
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">搜索</label>
+              <label className="text-sm font-medium">{t('common.search')}</label>
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
-                  placeholder="搜索网站、国家、区号、项目..."
+                  placeholder={t('guide.searchPlaceholder')}
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
                   className="pl-10 min-h-[44px]"
@@ -233,26 +235,26 @@ const GuideListPage = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">结果类型</label>
+              <label className="text-sm font-medium">{t('guide.resultType')}</label>
               <Select value={filters.result} onValueChange={(value) => handleFilterChange('result', value)}>
                 <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">全部结果</SelectItem>
-                  <SelectItem value="failure">仅失败记录</SelectItem>
-                  <SelectItem value="success">仅成功记录</SelectItem>
+                  <SelectItem value="all">{t('guide.allResults')}</SelectItem>
+                  <SelectItem value="failure">{t('guide.failureOnly')}</SelectItem>
+                  <SelectItem value="success">{t('guide.successOnly')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">网站</label>
+              <label className="text-sm font-medium">{t('guide.website')}</label>
               <Select value={filters.website} onValueChange={(value) => handleFilterChange('website', value)}>
                 <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">全部网站</SelectItem>
+                  <SelectItem value="all">{t('guide.allWebsites')}</SelectItem>
                   {websites.map(website => (
                     <SelectItem key={website.id} value={website.name}>{website.name}</SelectItem>
                   ))}
@@ -260,13 +262,13 @@ const GuideListPage = () => {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">国家</label>
+              <label className="text-sm font-medium">{t('guide.country')}</label>
               <Select value={filters.country} onValueChange={(value) => handleFilterChange('country', value)}>
                 <SelectTrigger className="min-h-[44px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">全部国家</SelectItem>
+                  <SelectItem value="all">{t('guide.allCountries')}</SelectItem>
                   {countries.map(country => (
                     <SelectItem key={country.id} value={country.name}>{country.name}</SelectItem>
                   ))}
@@ -282,7 +284,7 @@ const GuideListPage = () => {
         {filteredSubmissions.length === 0 ? (
           <Card>
             <CardContent className="pt-6 text-center">
-              <p className="text-gray-500">没有找到符合条件的记录</p>
+              <p className="text-gray-500">{t('guide.noRecordsFound')}</p>
             </CardContent>
           </Card>
         ) : (
@@ -309,7 +311,7 @@ const GuideListPage = () => {
                           variant={submission.result === 'failure' ? 'destructive' : 'default'}
                           className="font-medium"
                         >
-                          {submission.result === 'failure' ? '接码失败' : '接码成功'}
+                          {submission.result === 'failure' ? t('guide.smsFailure') : t('guide.smsSuccess')}
                         </Badge>
                       </div>
                       <span className="text-sm text-gray-500 flex items-center space-x-1">
@@ -320,9 +322,9 @@ const GuideListPage = () => {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                       <div>
-                        <span className="font-medium text-gray-700">网站：</span>
+                        <span className="font-medium text-gray-700">{t('guide.websiteLabel')}</span>
                         <div className="flex items-center space-x-1 mt-1">
-                          <span>{submission.website?.name || '未知网站'}</span>
+                          <span>{submission.website?.name || t('guide.unknownWebsite')}</span>
                           {submission.website?.url && (
                             <>
                               <ExternalLink className="h-3 w-3 text-gray-400" />
@@ -332,9 +334,9 @@ const GuideListPage = () => {
                         </div>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">国家：</span>
+                        <span className="font-medium text-gray-700">{t('guide.countryLabel')}</span>
                         <div className="mt-1">
-                          <span>{submission.country?.name || '未知国家'}</span>
+                          <span>{submission.country?.name || t('guide.unknownCountry')}</span>
                           {submission.country?.code && (
                             <span className="text-gray-500"> ({submission.country.code})</span>
                           )}
@@ -344,16 +346,16 @@ const GuideListPage = () => {
                         </div>
                       </div>
                       <div>
-                        <span className="font-medium text-gray-700">项目：</span>
+                        <span className="font-medium text-gray-700">{t('guide.projectLabel')}</span>
                         <div className="mt-1">
-                          <span>{submission.project?.name || '未知项目'}</span>
+                          <span>{submission.project?.name || t('guide.unknownProject')}</span>
                         </div>
                       </div>
                     </div>
                     
                     {submission.note && (
                       <div className="bg-white p-3 rounded border">
-                        <span className="font-medium text-gray-700">备注：</span>
+                        <span className="font-medium text-gray-700">{t('guide.noteLabel')}</span>
                         <p className="text-gray-600 mt-1">{submission.note}</p>
                       </div>
                     )}
