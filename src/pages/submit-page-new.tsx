@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Textarea } from '../components/ui/textarea'
@@ -21,6 +22,7 @@ function InlineSearchableWebsiteSelect({
   onValueChange: (value: string) => void
   placeholder?: string
 }) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredWebsites, setFilteredWebsites] = useState<Website[]>(websites)
@@ -92,7 +94,7 @@ function InlineSearchableWebsiteSelect({
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="搜索网站名称或网址..."
+              placeholder={t('submit.searchWebsites')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
@@ -129,7 +131,7 @@ function InlineSearchableWebsiteSelect({
               </>
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                没有找到匹配的网站
+                {t('submit.noWebsitesFound')}
               </div>
             )}
           </div>
@@ -151,6 +153,7 @@ function InlineSearchableProjectSelect({
   onValueChange: (value: string) => void
   placeholder?: string
 }) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects)
@@ -219,7 +222,7 @@ function InlineSearchableProjectSelect({
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="搜索项目名称..."
+              placeholder={t('submit.searchProjects')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
@@ -254,7 +257,7 @@ function InlineSearchableProjectSelect({
               </>
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500 text-center">
-                没有找到匹配的项目
+                {t('submit.noProjectsFound')}
               </div>
             )}
           </div>
@@ -265,6 +268,7 @@ function InlineSearchableProjectSelect({
 }
 
 export default function SubmitPageNew() {
+  const { t } = useTranslation()
   const [websites, setWebsites] = useState<Website[]>([])
   const [countries, setCountries] = useState<Country[]>([])
   const [projects, setProjects] = useState<Project[]>([])
@@ -305,7 +309,7 @@ export default function SubmitPageNew() {
       setProjects(projectsData)
     } catch (error) {
       console.error('加载数据失败:', error)
-      setErrorMessage('加载数据失败，请刷新页面重试')
+      setErrorMessage(t('submit.loadDataFailed'))
     } finally {
       setLoading(false)
     }
@@ -315,7 +319,7 @@ export default function SubmitPageNew() {
     e.preventDefault()
     
     if (!selectedWebsite || !selectedCountry || !selectedProject || !result) {
-      setErrorMessage('请填写所有必填项')
+      setErrorMessage(t('submit.fillAllRequired'))
       return
     }
 
@@ -327,7 +331,7 @@ export default function SubmitPageNew() {
       const canSubmit = await checkIpLimit(userIP)
       
       if (!canSubmit) {
-        setErrorMessage('提交过于频繁，请稍后再试（每小时最多10次）')
+        setErrorMessage(t('submit.submitTooFrequent'))
         setSubmitting(false)
         return
       }
@@ -358,11 +362,11 @@ export default function SubmitPageNew() {
           setSubmitStatus('idle')
         }, 3000)
       } else {
-        setErrorMessage('提交失败，请稍后重试')
+        setErrorMessage(t('submit.submitFailed'))
       }
     } catch (error) {
       console.error('提交失败:', error)
-      setErrorMessage('提交失败，请检查网络连接')
+      setErrorMessage(t('submit.networkError'))
     } finally {
       setSubmitting(false)
     }
@@ -373,7 +377,7 @@ export default function SubmitPageNew() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">正在加载表单...</p>
+          <p className="text-gray-600">{t('submit.loadingForm')}</p>
         </div>
       </div>
     )
@@ -389,11 +393,11 @@ export default function SubmitPageNew() {
           <div className="flex items-center justify-center gap-2 md:gap-3 mb-3 md:mb-4">
             <Heart className="h-6 w-6 md:h-8 md:w-8 text-red-500" />
             <h1 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              帮助他人避坑
+              {t('submit.title')}
             </h1>
           </div>
           <p className="text-gray-600 text-sm md:text-lg px-4">
-            分享你的接码失败经历，让其他人少花冤枉钱
+            {t('submit.subtitle')}
           </p>
         </div>
 
@@ -403,10 +407,10 @@ export default function SubmitPageNew() {
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
               <AlertTriangle className="h-5 w-5 md:h-6 md:w-6 text-orange-500" />
-              分享接码经历
+              {t('submit.formTitle')}
             </CardTitle>
             <CardDescription className="text-sm md:text-base">
-              刚刚接码失败了？分享一下，让其他人避免同样的损失
+              {t('submit.formDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
@@ -414,8 +418,8 @@ export default function SubmitPageNew() {
               {/* 网站选择 */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">
-                  接码网站 <span className="text-red-500">*</span>
-                  <span className="text-xs text-blue-600 ml-2">🔍 支持搜索</span>
+                  {t('submit.websiteLabel')} <span className="text-red-500">{t('submit.required')}</span>
+                  <span className="text-xs text-blue-600 ml-2">{t('submit.websiteSearchHint')}</span>
                 </Label>
                 
                 <div className="flex gap-2">
@@ -424,7 +428,7 @@ export default function SubmitPageNew() {
                       websites={websites}
                       value={selectedWebsite === 'custom' ? '' : selectedWebsite}
                       onValueChange={setSelectedWebsite}
-                      placeholder="请选择接码网站（可搜索名称或网址）"
+                      placeholder={t('submit.websitePlaceholder')}
                     />
                   </div>
                   <Button
@@ -437,29 +441,29 @@ export default function SubmitPageNew() {
                         : 'hover:bg-blue-50'
                     }`}
                   >
-                    🔧 自定义网站
+                    {t('submit.customWebsite')}
                   </Button>
                 </div>
                 
                 {selectedWebsite === 'custom' && (
                   <div className="space-y-2 p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <Label className="text-sm font-medium text-blue-800">
-                      自定义网站信息
+                      {t('submit.customWebsiteInfo')}
                     </Label>
                     <Input
-                      placeholder="网站名称，例如: NewSMS"
+                      placeholder={t('submit.websiteNamePlaceholder')}
                       className="bg-white"
                       value={customWebsite.name}
                       onChange={(e) => setCustomWebsite({...customWebsite, name: e.target.value})}
                     />
                     <Input
-                      placeholder="网站网址，例如: https://newsms.com"
+                      placeholder={t('submit.websiteUrlPlaceholder')}
                       className="bg-white"
                       value={customWebsite.url}
                       onChange={(e) => setCustomWebsite({...customWebsite, url: e.target.value})}
                     />
                     <p className="text-xs text-blue-600">
-                      💡 自定义的网站信息会提交给管理员审核后添加到系统中
+                      {t('submit.customWebsiteNote')}
                     </p>
                   </div>
                 )}
@@ -468,8 +472,8 @@ export default function SubmitPageNew() {
               {/* 国家选择 */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">
-                  接码国家 <span className="text-red-500">*</span>
-                  <span className="text-xs text-green-600 ml-2">🔍 支持搜索</span>
+                  {t('submit.countryLabel')} <span className="text-red-500">{t('submit.required')}</span>
+                  <span className="text-xs text-green-600 ml-2">{t('submit.countrySearchHint')}</span>
                 </Label>
                 
                 <div className="flex gap-2">
@@ -478,7 +482,7 @@ export default function SubmitPageNew() {
                       countries={countries}
                       value={selectedCountry === 'custom' ? '' : selectedCountry}
                       onValueChange={setSelectedCountry}
-                      placeholder="请选择接码国家（可搜索名称、代码或区号）"
+                      placeholder={t('submit.countryPlaceholder')}
                     />
                   </div>
                   <Button
@@ -491,35 +495,35 @@ export default function SubmitPageNew() {
                         : 'hover:bg-green-50'
                     }`}
                   >
-                    🌍 自定义国家
+                    {t('submit.customCountry')}
                   </Button>
                 </div>
                 
                 {selectedCountry === 'custom' && (
                   <div className="space-y-2 p-4 bg-green-50 rounded-lg border border-green-200">
                     <Label className="text-sm font-medium text-green-800">
-                      自定义国家信息
+                      {t('submit.customCountryInfo')}
                     </Label>
                     <Input
-                      placeholder="国家名称，例如: 新加坡"
+                      placeholder={t('submit.countryNamePlaceholder')}
                       className="bg-white"
                       value={customCountry.name}
                       onChange={(e) => setCustomCountry({...customCountry, name: e.target.value})}
                     />
                     <Input
-                      placeholder="国家代码，例如: sg"
+                      placeholder={t('submit.countryCodePlaceholder')}
                       className="bg-white"
                       value={customCountry.code}
                       onChange={(e) => setCustomCountry({...customCountry, code: e.target.value})}
                     />
                     <Input
-                      placeholder="电话区号，例如: +65"
+                      placeholder={t('submit.phoneCodePlaceholder')}
                       className="bg-white"
                       value={customCountry.phone_code}
                       onChange={(e) => setCustomCountry({...customCountry, phone_code: e.target.value})}
                     />
                     <p className="text-xs text-green-600">
-                      💡 自定义的国家信息会提交给管理员审核后添加到系统中
+                      {t('submit.customCountryNote')}
                     </p>
                   </div>
                 )}
@@ -528,8 +532,8 @@ export default function SubmitPageNew() {
               {/* 项目选择 */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">
-                  接码项目 <span className="text-red-500">*</span>
-                  <span className="text-xs text-purple-600 ml-2">🔍 支持搜索</span>
+                  {t('submit.projectLabel')} <span className="text-red-500">{t('submit.required')}</span>
+                  <span className="text-xs text-purple-600 ml-2">{t('submit.projectSearchHint')}</span>
                 </Label>
                 
                 <div className="flex gap-2">
@@ -538,7 +542,7 @@ export default function SubmitPageNew() {
                       projects={projects}
                       value={selectedProject === 'custom' ? '' : selectedProject}
                       onValueChange={setSelectedProject}
-                      placeholder="请选择项目（可搜索项目名称）"
+                      placeholder={t('submit.projectPlaceholder')}
                     />
                   </div>
                   <Button
@@ -551,29 +555,29 @@ export default function SubmitPageNew() {
                         : 'hover:bg-purple-50'
                     }`}
                   >
-                    🚀 自定义项目
+                    {t('submit.customProject')}
                   </Button>
                 </div>
                 
                 {selectedProject === 'custom' && (
                   <div className="space-y-2 p-4 bg-purple-50 rounded-lg border border-purple-200">
                     <Label className="text-sm font-medium text-purple-800">
-                      自定义项目信息
+                      {t('submit.customProjectInfo')}
                     </Label>
                     <Input
-                      placeholder="项目名称，例如: 新浪微博"
+                      placeholder={t('submit.projectNamePlaceholder')}
                       className="bg-white"
                       value={customProject.name}
                       onChange={(e) => setCustomProject({...customProject, name: e.target.value})}
                     />
                     <Input
-                      placeholder="项目代码，例如: weibo"
+                      placeholder={t('submit.projectCodePlaceholder')}
                       className="bg-white"
                       value={customProject.code}
                       onChange={(e) => setCustomProject({...customProject, code: e.target.value})}
                     />
                     <p className="text-xs text-purple-600">
-                      💡 自定义的项目信息会提交给管理员审核后添加到系统中
+                      {t('submit.customProjectNote')}
                     </p>
                   </div>
                 )}
@@ -582,7 +586,7 @@ export default function SubmitPageNew() {
               {/* 结果选择 */}
               <div className="space-y-3">
                 <Label className="text-sm font-medium">
-                  接码结果 <span className="text-red-500">*</span>
+                  {t('submit.resultLabel')} <span className="text-red-500">{t('submit.required')}</span>
                 </Label>
                 <div className="grid grid-cols-1 gap-3">
                   <label className="flex items-center space-x-3 p-4 border-2 rounded-lg cursor-pointer hover:bg-red-50 transition-colors border-red-200 bg-red-50/50">
@@ -597,8 +601,8 @@ export default function SubmitPageNew() {
                     <div className="flex items-center gap-2">
                       <XCircle className="h-5 w-5 text-red-500" />
                       <div>
-                        <div className="font-medium text-red-700">接码失败</div>
-                        <div className="text-sm text-red-600">帮助他人避坑</div>
+                        <div className="font-medium text-red-700">{t('submit.failureResult')}</div>
+                        <div className="text-sm text-red-600">{t('submit.failureResultDesc')}</div>
                       </div>
                     </div>
                   </label>
@@ -615,8 +619,8 @@ export default function SubmitPageNew() {
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-5 w-5 text-green-500" />
                       <div>
-                        <div className="font-medium text-green-700">接码成功</div>
-                        <div className="text-sm text-green-600">分享经验</div>
+                        <div className="font-medium text-green-700">{t('submit.successResult')}</div>
+                        <div className="text-sm text-green-600">{t('submit.successResultDesc')}</div>
                       </div>
                     </div>
                   </label>
@@ -626,10 +630,10 @@ export default function SubmitPageNew() {
               {/* 备注输入 */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium">
-                  备注说明 (可选)
+                  {t('submit.noteLabel')}
                 </Label>
                 <Textarea
-                  placeholder="可以描述具体的失败原因或成功经验..."
+                  placeholder={t('submit.notePlaceholder')}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={4}
@@ -656,7 +660,7 @@ export default function SubmitPageNew() {
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center gap-2 text-green-700">
                     <CheckCircle className="h-4 w-4" />
-                    <span className="text-sm">提交成功！感谢你的分享 ❤️</span>
+                    <span className="text-sm">{t('submit.submitSuccess')}</span>
                   </div>
                 </div>
               )}
@@ -671,12 +675,12 @@ export default function SubmitPageNew() {
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 md:h-5 md:w-5 mr-2 animate-spin" />
-                    提交中...
+                    {t('submit.submitting')}
                   </>
                 ) : (
                   <>
                     <Send className="h-4 w-4 md:h-5 md:w-5 mr-2" />
-                    提交分享
+                    {t('submit.submitShare')}
                   </>
                 )}
               </Button>
