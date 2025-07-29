@@ -11,7 +11,7 @@ export interface Website {
   id: string
   name: string
   url: string
-  status: 'active' | 'inactive' | 'discontinued'
+  status: 'active' | 'inactive' | 'discontinued' | 'pending' | 'personal'
   created_at: string
   risk_level?: 'low' | 'medium' | 'high' // 新增：风险等级
   warning_message?: string // 新增：警告信息

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { 
   getWebsites, 
+  getAllWebsitesForAdmin,
   getCountries, 
   getProjects, 
   getSubmissions 
@@ -71,8 +72,8 @@ function AdminPageContent() {
   const loadAllData = async () => {
     setLoading(true)
     try {
-      const [websitesData, countriesData, projectsData, submissionsData] = await Promise.all([
-        getWebsites(),
+      const [websitesData, countriesData, projectsData, submissionsResult] = await Promise.all([
+        getAllWebsitesForAdmin(),
         getCountries(),
         getProjects(),
         getSubmissions()
@@ -81,7 +82,7 @@ function AdminPageContent() {
       setWebsites(websitesData)
       setCountries(countriesData)
       setProjects(projectsData)
-      setSubmissions(submissionsData)
+      setSubmissions(submissionsResult.data) // 只取数据部分
     } catch (error) {
       console.error('加载数据失败:', error)
     } finally {
@@ -417,6 +418,8 @@ function AdminPageContent() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="active">正常</SelectItem>
+                        <SelectItem value="personal">个人服务</SelectItem>
+                        <SelectItem value="pending">待审核</SelectItem>
                         <SelectItem value="inactive">维护中</SelectItem>
                         <SelectItem value="discontinued">已关闭</SelectItem>
                       </SelectContent>
@@ -443,8 +446,19 @@ function AdminPageContent() {
                         <div className="font-medium text-sm md:text-base">{website.name}</div>
                         <div className="text-xs md:text-sm text-gray-500 break-all">{website.url}</div>
                         <div className="flex items-center gap-2 mt-2 md:mt-1">
-                          <Badge variant={website.status === 'active' ? 'default' : 'secondary'} className="text-xs">
-                            {website.status === 'active' ? '正常' : website.status === 'inactive' ? '维护中' : '已关闭'}
+                          <Badge 
+                            variant={
+                              website.status === 'active' ? 'default' : 
+                              website.status === 'personal' ? 'outline' :
+                              website.status === 'pending' ? 'secondary' :
+                              'secondary'
+                            } 
+                            className="text-xs"
+                          >
+                            {website.status === 'active' ? '正常' : 
+                             website.status === 'personal' ? '个人服务' :
+                             website.status === 'pending' ? '待审核' :
+                             website.status === 'inactive' ? '维护中' : '已关闭'}
                           </Badge>
                           <span className="text-xs text-gray-400">
                             {formatDate(website.created_at)}
@@ -772,6 +786,8 @@ function AdminPageContent() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="active">正常</SelectItem>
+                        <SelectItem value="personal">个人服务</SelectItem>
+                        <SelectItem value="pending">待审核</SelectItem>
                         <SelectItem value="inactive">维护中</SelectItem>
                         <SelectItem value="discontinued">已关闭</SelectItem>
                       </SelectContent>

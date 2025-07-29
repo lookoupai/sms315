@@ -2,11 +2,34 @@ import { supabase } from '../lib/supabase'
 import type { Website, Country, Project, Submission } from '../lib/supabase'
 
 // 获取所有网站
-export async function getWebsites(): Promise<Website[]> {
+export async function getWebsites(includePersonal: boolean = false): Promise<Website[]> {
+  let query = supabase
+    .from('websites')
+    .select('*')
+  
+  if (includePersonal) {
+    // 包含个人服务：显示 active 和 personal 状态
+    query = query.in('status', ['active', 'personal'])
+  } else {
+    // 默认只显示正规平台
+    query = query.eq('status', 'active')
+  }
+  
+  const { data, error } = await query.order('name')
+  
+  if (error) {
+    console.error('获取网站列表失败:', error)
+    return []
+  }
+  
+  return data || []
+}
+
+// 获取所有网站（管理后台用）
+export async function getAllWebsitesForAdmin(): Promise<Website[]> {
   const { data, error } = await supabase
     .from('websites')
     .select('*')
-    .eq('status', 'active')
     .order('name')
   
   if (error) {

@@ -4,8 +4,8 @@ import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Input } from '../components/ui/input'
-import { AlertTriangle, Search, Filter, Clock, ExternalLink } from 'lucide-react'
-import { getSubmissions, getWebsites, getCountries, getProjects } from '../services/database'
+import { AlertTriangle, Search, Filter, Clock, ExternalLink, User } from 'lucide-react'
+import { getSubmissions, getAllWebsitesForAdmin, getCountries, getProjects } from '../services/database'
 import type { Submission, Website, Country, Project } from '../lib/supabase'
 
 export default function GuidePage() {
@@ -29,14 +29,14 @@ export default function GuidePage() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [submissionsData, websitesData, countriesData, projectsData] = await Promise.all([
+      const [submissionsResult, websitesData, countriesData, projectsData] = await Promise.all([
         getSubmissions(),
-        getWebsites(),
+        getAllWebsitesForAdmin(),
         getCountries(),
         getProjects()
       ])
       
-      setSubmissions(submissionsData)
+      setSubmissions(submissionsResult.data) // 只取数据部分
       setWebsites(websitesData)
       setCountries(countriesData)
       setProjects(projectsData)
@@ -250,7 +250,15 @@ export default function GuidePage() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <span className="font-medium">网站:</span>
-                            <span>{submission.website?.name}</span>
+                            <div className="flex items-center gap-1">
+                              <span>{submission.website?.name}</span>
+                              {submission.website?.status === 'personal' && (
+                                <div className="flex items-center gap-1">
+                                  <User className="h-3 w-3 text-blue-600" />
+                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
+                                </div>
+                              )}
+                            </div>
                             {submission.website?.url && (
                               <a 
                                 href={submission.website.url} 
@@ -305,7 +313,15 @@ export default function GuidePage() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <span className="font-medium">网站:</span>
-                            <span>{submission.website?.name}</span>
+                            <div className="flex items-center gap-1">
+                              <span>{submission.website?.name}</span>
+                              {submission.website?.status === 'personal' && (
+                                <div className="flex items-center gap-1">
+                                  <User className="h-3 w-3 text-blue-600" />
+                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
+                                </div>
+                              )}
+                            </div>
                             {submission.website?.url && (
                               <a 
                                 href={submission.website.url} 

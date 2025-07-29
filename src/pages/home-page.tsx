@@ -3,27 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { AlertTriangle, Send, Heart, Shield, Search, Filter, TrendingUp, Users } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { AlertTriangle, Send, Heart, Shield, Search, Filter, TrendingUp, Users, User } from 'lucide-react';
+import { getSubmissions } from '../services/database';
 import { useNavigate } from 'react-router-dom';
 import AdDisplay from '../components/ad-display';
 
-interface Submission {
-  id: number;
-  website_name: string;
-  country_name: string;
-  project_name: string;
-  result: 'success' | 'failure';
-  created_at: string;
-  failure_reason?: string;
-  备注?: string;
-}
+import type { Submission } from '../lib/supabase';
 
 export default function HomePage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterResult, setFilterResult] = useState<'all' | 'success' | 'failure'>('all');
+  const [includePersonal, setIncludePersonal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,14 +24,8 @@ export default function HomePage() {
 
   const fetchSubmissions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('submissions')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      setSubmissions(data || []);
+      const result = await getSubmissions(1, 20);
+      setSubmissions(result.data);
     } catch (error) {
       console.error('获取数据失败:', error);
     } finally {
@@ -48,14 +34,20 @@ export default function HomePage() {
   };
 
   const filteredSubmissions = submissions.filter(submission => {
-    const matchesSearch = 
-      submission.website_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      submission.country_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      submission.project_name?.toLowerCase().includes(searchTerm.toLowerCase());
+    // 搜索过滤
+    const matchesSearch = searchTerm === '' || 
+      submission.website?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      submission.country?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      submission.project?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      submission.note?.toLowerCase().includes(searchTerm.toLowerCase());
     
+    // 结果过滤
     const matchesFilter = filterResult === 'all' || submission.result === filterResult;
     
-    return matchesSearch && matchesFilter;
+    // 个人服务过滤
+    const matchesPersonal = includePersonal || submission.website?.status !== 'personal';
+    
+    return matchesSearch && matchesFilter && matchesPersonal;
   });
 
   const successCount = submissions.filter(s => s.result === 'success').length;
@@ -125,26 +117,70 @@ export default function HomePage() {
         </div>
 
         {/* 搜索和筛选区域 - 统一风格 */}
-        <Card className="card-primary mb-8">
+        <Card className="mb-8 border border-gray-200 bg-white shadow-sm">
           <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="搜索网站、国家或项目..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      placeholder="搜索网站、国家或项目..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                <div className="md:w-48">
+                  <Select value={filterResult} onValueChange={(value: 'all' | 'success' | 'failure') => setFilterResult(value)}>
+                    <option value="all">全部结果</option>
+                    <option value="success">仅成功</option>
+                    <option value="failure">仅失败</option>
+                  </Select>
                 </div>
               </div>
-              <div className="md:w-48">
-                <Select value={filterResult} onValueChange={(value: 'all' | 'success' | 'failure') => setFilterResult(value)}>
-                  <option value="all">全部结果</option>
-                  <option value="success">仅成功</option>
-                  <option value="failure">仅失败</option>
-                </Select>
+              
+              {/* 调试信息 */}
+              <div className="text-xs text-gray-500 bg-yellow-100 p-2 rounded">
+                调试: includePersonal = {includePersonal.toString()}
+              </div>
+              
+              {/* 个人服务切换开关 - 使用内联样式确保显示 */}
+              <div 
+                className="flex items-center justify-between p-4 rounded-lg border-2"
+                style={{ 
+                  backgroundColor: '#dbeafe', 
+                  borderColor: '#3b82f6',
+                  minHeight: '60px'
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <User className="h-5 w-5" style={{ color: '#3b82f6' }} />
+                  <span className="text-sm font-medium" style={{ color: '#1e40af' }}>
+                    显示个人服务
+                  </span>
+                  <span 
+                    className="text-xs px-2 py-1 rounded"
+                    style={{ 
+                      backgroundColor: '#bfdbfe', 
+                      color: '#1d4ed8' 
+                    }}
+                  >
+                    个人接码者、私人发卡网站等
+                  </span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={includePersonal}
+                    onChange={(e) => {
+                      console.log('开关被点击:', e.target.checked);
+                      setIncludePersonal(e.target.checked);
+                    }}
+                    className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                </label>
               </div>
             </div>
           </CardContent>
@@ -200,16 +236,24 @@ export default function HomePage() {
                   >
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium text-gray-900">{submission.website_name}</span>
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-gray-900">{submission.website?.name}</span>
+                            {submission.website?.status === 'personal' && (
+                              <>
+                                <User className="h-3 w-3 text-blue-600" />
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
+                              </>
+                            )}
+                          </div>
                           <span className="text-sm text-gray-500">•</span>
-                          <span className="text-sm text-gray-600">{submission.country_name}</span>
+                          <span className="text-sm text-gray-600">{submission.country?.name}</span>
                           <span className="text-sm text-gray-500">•</span>
-                          <span className="text-sm text-gray-600">{submission.project_name}</span>
+                          <span className="text-sm text-gray-600">{submission.project?.name}</span>
                         </div>
-                        {submission.result === 'failure' && submission.failure_reason && (
+                        {submission.result === 'failure' && submission.note && (
                           <p className="text-sm text-red-600 mt-1">
-                            失败原因: {submission.failure_reason}
+                            备注: {submission.note}
                           </p>
                         )}
                       </div>

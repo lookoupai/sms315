@@ -4,17 +4,20 @@ import { Button } from '../components/ui/button'
 import { Textarea } from '../components/ui/textarea'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
-import { AlertTriangle, Heart, Send, CheckCircle, XCircle, Loader2 } from 'lucide-react'
-import { getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
+import { AlertTriangle, Heart, Send, CheckCircle, XCircle, Loader2, User } from 'lucide-react'
+import { getWebsites, getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
+import SearchableWebsiteSelect from '../components/SearchableWebsiteSelect'
 import SearchableCountrySelect from '../components/SearchableCountrySelect'
 import SearchableProjectSelect from '../components/SearchableProjectSelect'
-import type { Country, Project } from '../lib/supabase'
+import type { Website, Country, Project } from '../lib/supabase'
 
 export default function SubmitPage() {
+  const [websites, setWebsites] = useState<Website[]>([])
   const [countries, setCountries] = useState<Country[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [includePersonal, setIncludePersonal] = useState(false)
   
   // 表单状态
   const [selectedWebsite, setSelectedWebsite] = useState('')
@@ -39,11 +42,13 @@ export default function SubmitPage() {
   const loadData = async () => {
     setLoading(true)
     try {
-      const [countriesData, projectsData] = await Promise.all([
+      const [websitesData, countriesData, projectsData] = await Promise.all([
+        getAllWebsitesForAdmin(), // 加载所有网站，包括个人服务
         getCountries(),
         getProjects()
       ])
       
+      setWebsites(websitesData)
       setCountries(countriesData)
       setProjects(projectsData)
     } catch (error) {
@@ -176,14 +181,38 @@ export default function SubmitPage() {
               <div className="space-y-2">
                 <Label htmlFor="website" className="text-sm font-medium">
                   接码网站 <span className="text-red-500">*</span>
-                  <span className="text-xs text-blue-600 ml-2">🔍 可搜索组件已加载</span>
                 </Label>
-                <div className="relative">
-                  <div className="p-4 bg-red-100 border border-red-300 rounded-lg">
-                    <p className="text-red-700 font-bold">🚨 测试：如果您看到这个红色框，说明代码更新成功了！</p>
-                    <p className="text-red-600 text-sm">原本这里应该是可搜索的网站选择组件</p>
+                
+                {/* 个人服务开关 - 明显的视觉样式 */}
+                <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg mb-2">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">显示个人服务</span>
+                    <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                      个人接码者、私人发卡网站等
+                    </span>
                   </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={includePersonal}
+                      onChange={(e) => setIncludePersonal(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
                 </div>
+                <SearchableWebsiteSelect
+                  websites={websites.filter(w => 
+                    includePersonal ? 
+                      ['active', 'personal'].includes(w.status) : 
+                      w.status === 'active'
+                  )}
+                  value={selectedWebsite}
+                  onValueChange={setSelectedWebsite}
+                  placeholder="请选择接码网站（可搜索名称或网址）"
+                  includePersonal={includePersonal}
+                />
                 
                 {selectedWebsite === 'custom' && (
                   <div className="space-y-2 p-4 bg-blue-50 rounded-lg border border-blue-200">

@@ -28,6 +28,7 @@ const GuideListPage = () => {
     country: 'all',
     project: 'all'
   })
+  const [includePersonal, setIncludePersonal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   
@@ -42,7 +43,7 @@ const GuideListPage = () => {
     const loadBasicData = async () => {
       try {
         const [websitesData, countriesData, projectsData] = await Promise.all([
-          getWebsites(),
+          getWebsites(includePersonal),
           getCountries(),
           getProjects()
         ])
@@ -54,7 +55,7 @@ const GuideListPage = () => {
       }
     }
     loadBasicData()
-  }, [])
+  }, [includePersonal])
 
   // 当语言或国家数据变化时，更新本地化的国家列表
   useEffect(() => {
@@ -101,6 +102,13 @@ const GuideListPage = () => {
   useEffect(() => {
     let filtered = submissions
 
+    // 个人服务过滤 - 如果不包含个人服务，则过滤掉个人服务的记录
+    if (!includePersonal) {
+      filtered = filtered.filter(item => 
+        !item.website || item.website.status !== 'personal'
+      )
+    }
+
     // 搜索过滤 - 支持网站、国家名称、国家代码、电话区号、项目、备注
     if (filters.search) {
       filtered = filtered.filter(item =>
@@ -114,7 +122,7 @@ const GuideListPage = () => {
     }
 
     setFilteredSubmissions(filtered)
-  }, [submissions, filters.search])
+  }, [submissions, filters.search, includePersonal])
 
   // 处理筛选器变化
   const handleFilterChange = (key: string, value: string) => {
@@ -223,6 +231,36 @@ const GuideListPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* 个人服务开关 - 独立区域 */}
+      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <CardContent className="p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-semibold text-blue-900">包含个人服务</h3>
+                <p className="text-sm text-blue-700">个人接码者、私人发卡网站等</p>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={includePersonal}
+                onChange={(e) => setIncludePersonal(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* 筛选器 */}
       <Card>
@@ -352,7 +390,17 @@ const GuideListPage = () => {
                       <div>
                         <span className="font-medium text-gray-700">{t('guide.websiteLabel')}</span>
                         <div className="flex items-center space-x-1 mt-1">
-                          <span>{submission.website?.name || t('guide.unknownWebsite')}</span>
+                          <div className="flex items-center space-x-2">
+                            {submission.website?.status === 'personal' && (
+                              <div className="flex items-center space-x-1">
+                                <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                                </svg>
+                                <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">个人</Badge>
+                              </div>
+                            )}
+                            <span>{submission.website?.name || t('guide.unknownWebsite')}</span>
+                          </div>
                           {submission.website?.url && (
                             <>
                               <ExternalLink className="h-3 w-3 text-gray-400" />

@@ -68,12 +68,22 @@ function InlineSearchableWebsiteSelect({
         onClick={() => setIsOpen(!isOpen)}
         className="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:border-gray-400"
       >
-        <span className={selectedWebsite ? "text-gray-900" : "text-gray-500"}>
-          {selectedWebsite 
-            ? `${selectedWebsite.name} (${selectedWebsite.url})`
-            : placeholder
-          }
-        </span>
+        <div className={`flex items-center space-x-2 ${selectedWebsite ? "text-gray-900" : "text-gray-500"}`}>
+          {selectedWebsite && selectedWebsite.status === 'personal' && (
+            <div className="flex items-center space-x-1">
+              <svg className="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
+              <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">个人</span>
+            </div>
+          )}
+          <span>
+            {selectedWebsite 
+              ? `${selectedWebsite.name} (${selectedWebsite.url})`
+              : placeholder
+            }
+          </span>
+        </div>
         <div className="flex items-center gap-1">
           {selectedWebsite && (
             <X 
@@ -121,9 +131,19 @@ function InlineSearchableWebsiteSelect({
                     }}
                     className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-3 py-2 text-sm outline-none hover:bg-gray-100 focus:bg-gray-100 text-left"
                   >
-                    <span className="flex-1">
-                      {website.name} ({website.url})
-                    </span>
+                    <div className="flex items-center space-x-2 flex-1">
+                      {website.status === 'personal' && (
+                        <div className="flex items-center space-x-1">
+                          <svg className="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">个人</span>
+                        </div>
+                      )}
+                      <span>
+                        {website.name} ({website.url})
+                      </span>
+                    </div>
                     {value === website.id && (
                       <span className="absolute right-2 h-3.5 w-3.5">✓</span>
                     )}
@@ -276,6 +296,7 @@ export default function SubmitPageNew() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [includePersonal, setIncludePersonal] = useState(false)
   
   // 表单状态
   const [selectedWebsite, setSelectedWebsite] = useState('')
@@ -295,7 +316,7 @@ export default function SubmitPageNew() {
 
   useEffect(() => {
     loadData()
-  }, [])
+  }, [includePersonal])
 
   // 当语言或国家数据变化时，更新本地化的国家列表
   useEffect(() => {
@@ -309,7 +330,7 @@ export default function SubmitPageNew() {
     setLoading(true)
     try {
       const [websitesData, countriesData, projectsData] = await Promise.all([
-        getWebsites(),
+        getWebsites(includePersonal),
         getCountries(),
         getProjects()
       ])
@@ -429,6 +450,34 @@ export default function SubmitPageNew() {
                   {t('submit.websiteLabel')} <span className="text-red-500">{t('submit.required')}</span>
                   <span className="text-xs text-blue-600 ml-1 md:ml-2">{t('submit.websiteSearchHint')}</span>
                 </Label>
+                
+                {/* 个人服务开关 - 优化设计 */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200 mb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-blue-900 text-sm">包含个人服务</h4>
+                        <p className="text-xs text-blue-700">个人接码者、私人发卡网站等</p>
+                      </div>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={includePersonal}
+                        onChange={(e) => setIncludePersonal(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
+                </div>
                 
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1 min-w-0">
