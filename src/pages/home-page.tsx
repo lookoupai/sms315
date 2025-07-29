@@ -6,6 +6,7 @@ import { Select } from '@/components/ui/select';
 import { AlertTriangle, Send, Heart, Shield, Search, Filter, TrendingUp, Users } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import AdDisplay from '../components/ad-display';
 
 interface Submission {
   id: number;
@@ -65,6 +66,12 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-4 py-8">
         
+        {/* 公告栏 */}
+        <AdDisplay 
+          position="notice" 
+          className="mb-6"
+        />
+
         {/* 主标题区域 - 统一风格 */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
@@ -77,6 +84,12 @@ export default function HomePage() {
             分享你的接码失败经历，让其他人少花冤枉钱
           </p>
         </div>
+
+        {/* 横幅广告 */}
+        <AdDisplay 
+          position="banner" 
+          className="mb-8"
+        />
 
         {/* 统计卡片区域 - 统一风格 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

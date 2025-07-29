@@ -15,7 +15,8 @@ import {
   Users,
   BarChart3,
   Save,
-  X
+  X,
+  Megaphone
 } from 'lucide-react'
 import { 
   getWebsites, 
@@ -26,9 +27,10 @@ import {
 import { supabase } from '../lib/supabase'
 import type { Website, Country, Project, Submission } from '../lib/supabase'
 import AdminAuth from '../components/admin-auth'
+import AdManager from '../components/ad-manager'
 
 function AdminPageContent() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'websites' | 'countries' | 'projects' | 'submissions'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'websites' | 'countries' | 'projects' | 'submissions' | 'ads'>('overview')
   const [, setLoading] = useState(false)
   
   // 数据状态
@@ -298,6 +300,7 @@ function AdminPageContent() {
     { id: 'countries', name: '国家管理', icon: Building },
     { id: 'projects', name: '项目管理', icon: Building },
     { id: 'submissions', name: '提交记录', icon: Users },
+    { id: 'ads', name: '广告管理', icon: Megaphone },
   ]
 
   return (
@@ -710,6 +713,13 @@ function AdminPageContent() {
               </div>
             </CardContent>
           </Card>
+        )}
+
+        {/* 广告管理 */}
+        {activeTab === 'ads' && (
+          <div className="bg-white/80 backdrop-blur-sm border-0 shadow-lg rounded-lg p-6">
+            <AdManager />
+          </div>
         )}
 
         {/* 编辑网站弹窗 - 移动端优化 */}

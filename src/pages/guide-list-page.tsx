@@ -11,6 +11,7 @@ import { Pagination } from '../components/pagination'
 import { SearchableSelect } from '../components/searchable-select'
 import { getLocalizedCountries } from '../utils/country-names'
 import type { Submission, Website, Country, Project } from '../lib/supabase'
+import AdDisplay from '../components/ad-display'
 
 const GuideListPage = () => {
   const { t, i18n } = useTranslation()
@@ -165,6 +166,12 @@ const GuideListPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* 公告栏 */}
+      <AdDisplay 
+        position="notice" 
+        className="mb-4"
+      />
+
       {/* 页面标题 - 移动端优化 */}
       <div className="text-center space-y-2 mb-4 md:mb-6">
         <h1 className="text-xl md:text-3xl font-bold text-gray-900 flex items-center justify-center space-x-2">
@@ -173,6 +180,12 @@ const GuideListPage = () => {
         </h1>
         <p className="text-gray-600 text-sm md:text-base px-2 md:px-4 leading-relaxed">{t('guide.subtitle')}</p>
       </div>
+
+      {/* 横幅广告 */}
+      <AdDisplay 
+        position="banner" 
+        className="mb-6"
+      />
 
       {/* 统计信息 - 移动端优化 */}
       <div className="grid grid-cols-3 md:grid-cols-3 gap-3 md:gap-4 mb-6">
