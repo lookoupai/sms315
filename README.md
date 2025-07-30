@@ -136,16 +136,50 @@ git push origin main
 2. **连接Vercel**
 - 访问 [Vercel Dashboard](https://vercel.com)
 - 导入GitHub仓库
-- 配置环境变量
+- 在"Framework Preset"（架构预设）中选择"Vite"
+- 根目录保持为"./"
 
 3. **设置环境变量**
 在Vercel Dashboard中添加：
 - `VITE_ADMIN_PASSWORD`: 你的管理员密码
 - `VITE_SUPABASE_URL`: Supabase项目URL
 - `VITE_SUPABASE_ANON_KEY`: Supabase匿名密钥
+- `SUPABASE_URL`: 与VITE_SUPABASE_URL相同（API函数需要）
+- `SUPABASE_ANON_KEY`: 与VITE_SUPABASE_ANON_KEY相同（API函数需要）
 
-4. **部署完成**
-访问分配的域名即可使用
+4. **创建vercel.json配置文件**
+在项目根目录创建vercel.json文件，内容如下：
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
+```
+
+5. **部署完成**
+点击"Deploy"按钮开始部署，完成后访问分配的域名即可使用
 
 详细部署指南请查看: [VERCEL_DEPLOY_GUIDE.md](./VERCEL_DEPLOY_GUIDE.md)
 
