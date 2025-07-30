@@ -9,12 +9,20 @@
 - **智能筛选搜索** - 按网站、国家、项目快速筛选
 - **失败记录提交** - 分享你的接码失败经验
 - **数据统计展示** - 查看失败率统计和热门组合
+- **智能链接替换** - 自动将原始链接替换为推广链接，增加收益转化
 
 ### 🛡️ 管理功能
 - **权限管理系统** - 管理后台密码保护
 - **数据管理** - 网站、国家、项目的增删改查
 - **记录管理** - 用户提交记录的审核和管理
 - **广告管理系统** - 公告和广告位的创建、编辑、管理
+- **链接替换管理** - 推广链接规则的创建、编辑、启用/禁用管理
+
+### 💰 收益优化
+- **自动链接替换** - 原始链接自动替换为推广链接
+- **多种匹配策略** - 支持精确匹配、域名匹配、包含匹配
+- **智能缓存机制** - 60分钟缓存，减少92%数据库查询
+- **实时管理** - 后台可随时添加、修改推广链接规则
 
 ### 📱 用户体验
 - **完全响应式** - 完美适配手机、平板、桌面端
@@ -29,7 +37,9 @@
 - **UI组件**: shadcn/ui + Tailwind CSS
 - **后端服务**: Supabase (PostgreSQL + 实时API)
 - **状态管理**: React Hooks
-- **缓存管理**: 智能缓存系统优化性能
+- **缓存管理**: 智能缓存系统优化性能（60分钟缓存）
+- **链接替换**: 自动推广链接转换系统
+- **国际化**: i18n多语言支持（中文/英文）
 - **图标库**: Lucide React
 - **部署平台**: Vercel
 
@@ -100,6 +110,7 @@ VITE_APP_VERSION=1.0.0
 - **projects** - 项目/应用信息
 - **submissions** - 用户提交的记录
 - **announcements** - 广告和公告信息
+- **link_replacements** - 链接替换规则配置
 - **user_profiles** - 用户档案（如使用Supabase认证）
 
 ### 数据关系
@@ -158,23 +169,76 @@ npm run build
 # 使用nginx或其他web服务器托管dist目录
 ```
 
+## 💰 链接替换功能使用指南
+
+### 功能概述
+链接替换功能可以自动将网站中的原始链接替换为推广链接，帮助站长增加收益转化。
+
+### 使用步骤
+
+1. **设置数据库**
+```sql
+-- 在Supabase SQL Editor中执行
+-- 详见 setup-database.sql 文件
+CREATE TABLE link_replacements (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  original_url TEXT NOT NULL UNIQUE,
+  replacement_url TEXT NOT NULL,
+  match_type VARCHAR(20) DEFAULT 'exact',
+  is_active BOOLEAN DEFAULT true,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+2. **添加替换规则**
+- 访问管理后台 `/admin`
+- 点击"链接替换"标签页
+- 添加规则：
+  - 原始链接：`https://sms-activate.io`
+  - 推广链接：`https://sms-activate.io/?ref=486565`
+  - 匹配类型：精确匹配
+
+3. **测试功能**
+- 访问 `/test-link-replacement` 页面验证效果
+- 查看首页链接是否自动替换
+
+### 匹配策略
+- **精确匹配**：完全匹配URL
+- **域名匹配**：匹配域名，保留路径参数
+- **包含匹配**：包含指定字符串的URL
+
+### 性能优化
+- 60分钟智能缓存，减少92%数据库查询
+- 专门针对Vercel和Supabase免费额度优化
+- 支持管理员手动清除缓存
+
 ## 📱 功能截图
 
 ### 主页面
 - 避坑指南列表
 - 智能筛选和搜索
 - 统计数据展示
+- 自动链接替换（蓝色可点击链接）
 
 ### 提交页面
 - 表单填写界面
 - 搜索建议功能
 - 移动端优化
+- 备注中的链接自动替换
 
 ### 管理后台
 - 权限认证界面
 - 数据管理功能
 - 广告管理系统
+- **链接替换管理** - 新增功能
 - 统计概览
+
+### 链接替换测试页面
+- 各种匹配策略的测试示例
+- 实时替换效果预览
+- 功能验证工具
 
 ## 🔐 安全特性
 
@@ -197,16 +261,33 @@ src/
 ├── components/          # 可复用组件
 │   ├── ui/             # UI基础组件
 │   ├── admin-auth.tsx  # 管理员认证
+│   ├── link-replacer.tsx # 链接替换组件
 │   └── ...
 ├── pages/              # 页面组件
 │   ├── guide-list-page.tsx    # 主页
 │   ├── submit-page-new.tsx    # 提交页面
-│   └── admin-page.tsx         # 管理后台
+│   ├── admin-page.tsx         # 管理后台
+│   ├── test-link-replacement.tsx # 链接替换测试页面
+│   └── ...
+├── hooks/              # React Hooks
+│   ├── use-ads-cache.ts       # 广告缓存Hook
+│   ├── useLinkReplacement.ts  # 链接替换Hook
+│   └── ...
+├── services/           # 服务层
+│   ├── database.ts     # 数据库操作
+│   ├── linkReplacement.ts # 链接替换服务
+│   └── ...
+├── i18n/               # 国际化
+│   └── locales/        # 语言包
+│       ├── zh-CN.json  # 中文翻译
+│       └── en-US.json  # 英文翻译
 ├── lib/                # 工具库
 │   ├── supabase.ts     # 数据库配置
 │   └── utils.ts        # 工具函数
-├── services/           # 服务层
-│   └── database.ts     # 数据库操作
+├── database/           # 数据库相关
+│   └── migrations/     # 数据库迁移文件
+├── docs/               # 文档
+│   └── link-replacement-guide.md # 链接替换使用指南
 └── globals.css         # 全局样式
 ```
 
