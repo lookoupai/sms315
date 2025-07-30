@@ -21,7 +21,7 @@ const adsCache = new Map<string, { data: Ad[], timestamp: number }>()
 export function useAdsCache({ 
   position, 
   maxAds = 3, 
-  cacheTime = 300000 // 5分钟缓存
+  cacheTime = 3600000 // 60分钟缓存
 }: AdsCacheOptions = {}) {
   const [state, setState] = useState<AdsCacheState>({
     ads: [],

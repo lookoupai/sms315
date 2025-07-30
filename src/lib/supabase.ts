@@ -80,3 +80,15 @@ export interface RiskCombination {
   last_failure_date: string
   risk_level: 'low' | 'medium' | 'high'
 }
+
+// 新增：链接替换配置
+export interface LinkReplacement {
+  id: string
+  original_url: string
+  replacement_url: string
+  match_type: 'exact' | 'domain' | 'contains'
+  is_active: boolean
+  description?: string
+  created_at: string
+  updated_at: string
+}

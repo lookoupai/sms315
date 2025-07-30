@@ -5,10 +5,11 @@ import { Textarea } from '../components/ui/textarea'
 import { Label } from '../components/ui/label'
 import { Input } from '../components/ui/input'
 import { AlertTriangle, Heart, Send, CheckCircle, XCircle, Loader2, User } from 'lucide-react'
-import { getWebsites, getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
+import { getAllWebsitesForAdmin, getCountries, getProjects, createSubmission, checkIpLimit, getUserIP } from '../services/database'
 import SearchableWebsiteSelect from '../components/SearchableWebsiteSelect'
 import SearchableCountrySelect from '../components/SearchableCountrySelect'
 import SearchableProjectSelect from '../components/SearchableProjectSelect'
+import { SmartLinkReplacer } from '../components/link-replacer'
 import type { Website, Country, Project } from '../lib/supabase'
 
 export default function SubmitPage() {
@@ -368,7 +369,7 @@ export default function SubmitPage() {
                 </Label>
                 <Textarea
                   id="note"
-                  placeholder="可以描述具体的失败原因或成功经验..."
+                  placeholder="可以描述具体的失败原因或成功经验，可以包含相关网站链接..."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={4}
@@ -378,6 +379,14 @@ export default function SubmitPage() {
                 <div className="text-xs text-gray-500 text-right">
                   {note.length}/500
                 </div>
+                {note && (
+                  <div className="p-3 bg-gray-50 rounded-lg border">
+                    <div className="text-xs text-gray-600 mb-1">预览效果：</div>
+                    <SmartLinkReplacer className="text-sm text-gray-700">
+                      {note}
+                    </SmartLinkReplacer>
+                  </div>
+                )}
               </div>
 
               {/* 错误提示 */}

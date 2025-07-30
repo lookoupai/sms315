@@ -7,6 +7,7 @@ import { AlertTriangle, Send, Heart, Shield, Search, Filter, TrendingUp, Users, 
 import { getSubmissions } from '../services/database';
 import { useNavigate } from 'react-router-dom';
 import AdDisplay from '../components/ad-display';
+import { UrlLinkReplacer, SmartLinkReplacer } from '../components/link-replacer';
 
 import type { Submission } from '../lib/supabase';
 
@@ -239,9 +240,23 @@ export default function HomePage() {
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <div className="flex items-center gap-1">
                             <span className="font-medium text-gray-900">{submission.website?.name}</span>
+                            {submission.website?.url && (
+                              <>
+                                <span className="text-gray-500">(</span>
+                                <UrlLinkReplacer 
+                                  href={submission.website.url}
+                                  className="text-blue-600 hover:text-blue-800 underline text-sm"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  {submission.website.url}
+                                </UrlLinkReplacer>
+                                <span className="text-gray-500">)</span>
+                              </>
+                            )}
                             {submission.website?.status === 'personal' && (
                               <>
-                                <User className="h-3 w-3 text-blue-600" />
+                                <User className="h-3 w-3 text-blue-600 ml-2" />
                                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
                               </>
                             )}
@@ -253,7 +268,7 @@ export default function HomePage() {
                         </div>
                         {submission.result === 'failure' && submission.note && (
                           <p className="text-sm text-red-600 mt-1">
-                            备注: {submission.note}
+                            备注: <SmartLinkReplacer className="inline">{submission.note}</SmartLinkReplacer>
                           </p>
                         )}
                       </div>

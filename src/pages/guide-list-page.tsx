@@ -5,13 +5,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { AlertTriangle, CheckCircle, Search, Filter, Clock, ExternalLink, RefreshCw } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Search, Filter, Clock, RefreshCw } from 'lucide-react'
 import { getSubmissions, getWebsites, getCountries, getProjects } from '../services/database'
 import { Pagination } from '../components/pagination'
 import { SearchableSelect } from '../components/searchable-select'
 import { getLocalizedCountries } from '../utils/country-names'
 import type { Submission, Website, Country, Project } from '../lib/supabase'
 import AdDisplay from '../components/ad-display'
+import { UrlLinkReplacer, SmartLinkReplacer } from '../components/link-replacer'
 
 const GuideListPage = () => {
   const { t, i18n } = useTranslation()
@@ -403,8 +404,16 @@ const GuideListPage = () => {
                           </div>
                           {submission.website?.url && (
                             <>
-                              <ExternalLink className="h-3 w-3 text-gray-400" />
-                              <span className="text-gray-500 text-xs break-all">({submission.website.url})</span>
+                              <span className="text-gray-500">(</span>
+                              <UrlLinkReplacer 
+                                href={submission.website.url}
+                                className="text-blue-600 hover:text-blue-800 underline text-xs"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {submission.website.url}
+                              </UrlLinkReplacer>
+                              <span className="text-gray-500">)</span>
                             </>
                           )}
                         </div>
@@ -437,7 +446,9 @@ const GuideListPage = () => {
                     {submission.note && (
                       <div className="bg-white p-3 rounded border">
                         <span className="font-medium text-gray-700">{t('guide.noteLabel')}</span>
-                        <p className="text-gray-600 mt-1">{submission.note}</p>
+                        <div className="text-gray-600 mt-1">
+                          <SmartLinkReplacer>{submission.note}</SmartLinkReplacer>
+                        </div>
                       </div>
                     )}
                   </div>

@@ -16,22 +16,23 @@ import {
   BarChart3,
   Save,
   X,
-  Megaphone
+  Megaphone,
+  Link
 } from 'lucide-react'
 import { 
-  getWebsites, 
   getAllWebsitesForAdmin,
   getCountries, 
   getProjects, 
   getSubmissions 
 } from '../services/database'
 import { supabase } from '../lib/supabase'
-import type { Website, Country, Project, Submission } from '../lib/supabase'
+import type { Website, Country, Project, Submission, LinkReplacement } from '../lib/supabase'
+import { getAllLinkReplacements, addLinkReplacement, updateLinkReplacement, deleteLinkReplacement } from '../services/linkReplacement'
 import AdminAuth from '../components/admin-auth'
 import AdManager from '../components/ad-manager'
 
 function AdminPageContent() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'websites' | 'countries' | 'projects' | 'submissions' | 'ads'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'websites' | 'countries' | 'projects' | 'submissions' | 'ads' | 'links'>('overview')
   const [, setLoading] = useState(false)
   
   // 数据状态
@@ -39,6 +40,7 @@ function AdminPageContent() {
   const [countries, setCountries] = useState<Country[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [linkReplacements, setLinkReplacements] = useState<LinkReplacement[]>([])
   
   // 表单状态
   const [editingWebsite, setEditingWebsite] = useState<Website | null>(null)
@@ -47,6 +49,14 @@ function AdminPageContent() {
   const [newCountry, setNewCountry] = useState({ name: '', code: '', phone_code: '' })
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [newProject, setNewProject] = useState({ name: '', code: '' })
+  const [editingLinkReplacement, setEditingLinkReplacement] = useState<LinkReplacement | null>(null)
+  const [newLinkReplacement, setNewLinkReplacement] = useState({ 
+    original_url: '', 
+    replacement_url: '', 
+    match_type: 'exact' as const,
+    description: '',
+    is_active: true
+  })
   
   // 搜索状态
   const [countrySearch, setCountrySearch] = useState('')
@@ -72,17 +82,19 @@ function AdminPageContent() {
   const loadAllData = async () => {
     setLoading(true)
     try {
-      const [websitesData, countriesData, projectsData, submissionsResult] = await Promise.all([
+      const [websitesData, countriesData, projectsData, submissionsResult, linkReplacementsData] = await Promise.all([
         getAllWebsitesForAdmin(),
         getCountries(),
         getProjects(),
-        getSubmissions()
+        getSubmissions(),
+        getAllLinkReplacements()
       ])
       
       setWebsites(websitesData)
       setCountries(countriesData)
       setProjects(projectsData)
       setSubmissions(submissionsResult.data) // 只取数据部分
+      setLinkReplacements(linkReplacementsData)
     } catch (error) {
       console.error('加载数据失败:', error)
     } finally {
@@ -291,6 +303,63 @@ function AdminPageContent() {
     }
   }
 
+  // 添加链接替换规则
+  const handleAddLinkReplacement = async () => {
+    if (!newLinkReplacement.original_url || !newLinkReplacement.replacement_url) return
+    
+    try {
+      const success = await addLinkReplacement(newLinkReplacement)
+      if (success) {
+        setNewLinkReplacement({ 
+          original_url: '', 
+          replacement_url: '', 
+          match_type: 'exact',
+          description: '',
+          is_active: true
+        })
+        await loadAllData()
+      }
+    } catch (error) {
+      console.error('添加链接替换规则失败:', error)
+    }
+  }
+
+  // 更新链接替换规则
+  const handleUpdateLinkReplacement = async () => {
+    if (!editingLinkReplacement) return
+    
+    try {
+      const success = await updateLinkReplacement(editingLinkReplacement.id, {
+        original_url: editingLinkReplacement.original_url,
+        replacement_url: editingLinkReplacement.replacement_url,
+        match_type: editingLinkReplacement.match_type,
+        description: editingLinkReplacement.description,
+        is_active: editingLinkReplacement.is_active
+      })
+      
+      if (success) {
+        setEditingLinkReplacement(null)
+        await loadAllData()
+      }
+    } catch (error) {
+      console.error('更新链接替换规则失败:', error)
+    }
+  }
+
+  // 删除链接替换规则
+  const handleDeleteLinkReplacement = async (id: string) => {
+    if (!confirm('确定要删除这个链接替换规则吗？')) return
+    
+    try {
+      const success = await deleteLinkReplacement(id)
+      if (success) {
+        await loadAllData()
+      }
+    } catch (error) {
+      console.error('删除链接替换规则失败:', error)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('zh-CN')
   }
@@ -302,6 +371,7 @@ function AdminPageContent() {
     { id: 'projects', name: '项目管理', icon: Building },
     { id: 'submissions', name: '提交记录', icon: Users },
     { id: 'ads', name: '广告管理', icon: Megaphone },
+    { id: 'links', name: '链接替换', icon: Link },
   ]
 
   return (
@@ -736,6 +806,144 @@ function AdminPageContent() {
           </div>
         )}
 
+        {/* 链接替换管理 */}
+        {activeTab === 'links' && (
+          <div className="space-y-4 md:space-y-6">
+            {/* 添加链接替换规则表单 */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Plus className="h-5 w-5" />
+                  添加链接替换规则
+                </CardTitle>
+                <CardDescription>
+                  设置原始链接和推广链接的映射关系，提高收入转化
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">原始链接</Label>
+                    <Input
+                      value={newLinkReplacement.original_url}
+                      onChange={(e) => setNewLinkReplacement({...newLinkReplacement, original_url: e.target.value})}
+                      placeholder="例如: https://sms-activate.io"
+                      className="min-h-[44px]"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">推广链接</Label>
+                    <Input
+                      value={newLinkReplacement.replacement_url}
+                      onChange={(e) => setNewLinkReplacement({...newLinkReplacement, replacement_url: e.target.value})}
+                      placeholder="例如: https://sms-activate.io/?ref=486565"
+                      className="min-h-[44px]"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">匹配类型</Label>
+                    <Select 
+                      value={newLinkReplacement.match_type} 
+                      onValueChange={(value: any) => setNewLinkReplacement({...newLinkReplacement, match_type: value})}
+                    >
+                      <SelectTrigger className="min-h-[44px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="exact">精确匹配</SelectItem>
+                        <SelectItem value="domain">域名匹配</SelectItem>
+                        <SelectItem value="contains">包含匹配</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">描述</Label>
+                    <Input
+                      value={newLinkReplacement.description}
+                      onChange={(e) => setNewLinkReplacement({...newLinkReplacement, description: e.target.value})}
+                      placeholder="例如: SMS-Activate 推广链接"
+                      className="min-h-[44px]"
+                    />
+                  </div>
+                </div>
+                <Button onClick={handleAddLinkReplacement} className="w-full min-h-[44px]">
+                  <Plus className="h-4 w-4 mr-2" />
+                  添加替换规则
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* 链接替换规则列表 */}
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg">链接替换规则列表</CardTitle>
+                <CardDescription>当前有 {linkReplacements.length} 条替换规则</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 md:space-y-4">
+                  {linkReplacements.map(replacement => (
+                    <div key={replacement.id} className="flex flex-col md:flex-row md:items-center md:justify-between p-3 md:p-4 border rounded-lg bg-white shadow-sm">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge 
+                            variant={replacement.is_active ? 'default' : 'secondary'} 
+                            className="text-xs"
+                          >
+                            {replacement.is_active ? '启用' : '禁用'}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {replacement.match_type === 'exact' ? '精确' : 
+                             replacement.match_type === 'domain' ? '域名' : '包含'}
+                          </Badge>
+                          <span className="text-xs text-gray-400">
+                            {formatDate(replacement.created_at)}
+                          </span>
+                        </div>
+                        <div className="space-y-1 text-xs md:text-sm">
+                          <div><strong>原始:</strong> <span className="break-all">{replacement.original_url}</span></div>
+                          <div><strong>替换:</strong> <span className="break-all text-blue-600">{replacement.replacement_url}</span></div>
+                          {replacement.description && (
+                            <div><strong>描述:</strong> {replacement.description}</div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-3 md:mt-0">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setEditingLinkReplacement(replacement)}
+                          className="flex-1 md:flex-none min-h-[36px]"
+                        >
+                          <Edit className="h-4 w-4 mr-1 md:mr-0" />
+                          <span className="md:hidden">编辑</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleDeleteLinkReplacement(replacement.id)}
+                          className="flex-1 md:flex-none min-h-[36px]"
+                        >
+                          <Trash2 className="h-4 w-4 mr-1 md:mr-0" />
+                          <span className="md:hidden">删除</span>
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {linkReplacements.length === 0 && (
+                    <div className="text-center py-8">
+                      <Link className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">暂无链接替换规则</p>
+                      <p className="text-sm text-gray-400 mt-2">添加规则后，前端的链接将自动替换为推广链接</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* 编辑网站弹窗 - 移动端优化 */}
         {editingWebsite && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4">
@@ -927,6 +1135,106 @@ function AdminPageContent() {
                   <Button 
                     variant="outline" 
                     onClick={() => setEditingProject(null)}
+                    className="flex-1 min-h-[44px]"
+                  >
+                    取消
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* 编辑链接替换规则弹窗 - 移动端优化 */}
+        {editingLinkReplacement && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4">
+            <Card className="bg-white w-full max-w-2xl max-h-[95vh] md:max-h-[90vh] overflow-y-auto">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Edit className="h-5 w-5" />
+                    编辑链接替换规则
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setEditingLinkReplacement(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 p-4 md:p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">原始链接</Label>
+                    <Input
+                      value={editingLinkReplacement.original_url}
+                      onChange={(e) => setEditingLinkReplacement({...editingLinkReplacement, original_url: e.target.value})}
+                      placeholder="例如: https://sms-activate.io"
+                      className="min-h-[44px]"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">推广链接</Label>
+                    <Input
+                      value={editingLinkReplacement.replacement_url}
+                      onChange={(e) => setEditingLinkReplacement({...editingLinkReplacement, replacement_url: e.target.value})}
+                      placeholder="例如: https://sms-activate.io/?ref=486565"
+                      className="min-h-[44px]"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-sm font-medium">匹配类型</Label>
+                    <Select 
+                      value={editingLinkReplacement.match_type} 
+                      onValueChange={(value: any) => setEditingLinkReplacement({...editingLinkReplacement, match_type: value})}
+                    >
+                      <SelectTrigger className="min-h-[44px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="exact">精确匹配</SelectItem>
+                        <SelectItem value="domain">域名匹配</SelectItem>
+                        <SelectItem value="contains">包含匹配</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">状态</Label>
+                    <Select 
+                      value={editingLinkReplacement.is_active ? 'true' : 'false'} 
+                      onValueChange={(value) => setEditingLinkReplacement({...editingLinkReplacement, is_active: value === 'true'})}
+                    >
+                      <SelectTrigger className="min-h-[44px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="true">启用</SelectItem>
+                        <SelectItem value="false">禁用</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">描述</Label>
+                    <Input
+                      value={editingLinkReplacement.description || ''}
+                      onChange={(e) => setEditingLinkReplacement({...editingLinkReplacement, description: e.target.value})}
+                      placeholder="例如: SMS-Activate 推广链接"
+                      className="min-h-[44px]"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col md:flex-row gap-2">
+                  <Button onClick={handleUpdateLinkReplacement} className="flex-1 min-h-[44px]">
+                    <Save className="h-4 w-4 mr-2" />
+                    保存更改
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setEditingLinkReplacement(null)}
                     className="flex-1 min-h-[44px]"
                   >
                     取消
