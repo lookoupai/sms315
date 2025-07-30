@@ -463,8 +463,8 @@ export default function SubmitPageNew() {
                         </div>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-blue-900 text-sm">包含个人服务</h4>
-                        <p className="text-xs text-blue-700">个人接码者、私人发卡网站等</p>
+                        <h4 className="font-semibold text-blue-900 text-sm">{t('submit.personalService')}</h4>
+                        <p className="text-xs text-blue-700">{t('submit.personalServiceDesc')}</p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">

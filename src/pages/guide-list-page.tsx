@@ -246,8 +246,8 @@ const GuideListPage = () => {
                 </div>
               </div>
               <div>
-                <h3 className="font-semibold text-blue-900">包含个人服务</h3>
-                <p className="text-sm text-blue-700">个人接码者、私人发卡网站等</p>
+                <h3 className="font-semibold text-blue-900">{t('submit.personalService')}</h3>
+                <p className="text-sm text-blue-700">{t('submit.personalServiceDesc')}</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">

@@ -74,6 +74,8 @@
     "subtitle": "分享你的接码失败经历，让其他人少花冤枉钱",
     "formTitle": "分享接码经历",
     "formDescription": "刚刚接码失败了？分享一下，让其他人避免同样的损失",
+    "personalService": "包含个人服务",
+    "personalServiceDesc": "个人接码者、私人发卡网站等",
     "websiteLabel": "接码网站",
     "websiteSearchHint": "🔍 支持搜索",
     "websitePlaceholder": "请选择接码网站（可搜索名称或网址）",
