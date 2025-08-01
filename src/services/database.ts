@@ -155,56 +155,89 @@ export async function createSubmission(submission: {
   custom_project?: { name: string; code: string } | null
 }): Promise<boolean> {
   try {
-    // 处理自定义网站
+// 处理自定义网站
     let finalWebsiteId = submission.website_id
     if (submission.custom_website && submission.custom_website.name && submission.custom_website.url) {
-      const { data: websiteData, error: websiteError } = await supabase
+      // 先检查是否已存在相同名称的网站
+      const { data: existingWebsite, error: checkWebsiteError } = await supabase
         .from('websites')
-        .insert([{
-          name: submission.custom_website.name,
-          url: submission.custom_website.url,
-          status: 'pending' // 待审核状态
-        }])
-        .select()
-        .single()
+        .select('id')
+        .eq('name', submission.custom_website.name)
+        .maybeSingle()
       
-      if (!websiteError && websiteData) {
-        finalWebsiteId = websiteData.id
+      if (existingWebsite) {
+        finalWebsiteId = existingWebsite.id
+      } else {
+        const { data: websiteData, error: websiteError } = await supabase
+          .from('websites')
+          .insert([{
+            name: submission.custom_website.name,
+            url: submission.custom_website.url,
+            status: 'pending' // 待审核状态
+          }])
+          .select()
+          .single()
+        
+        if (!websiteError && websiteData) {
+          finalWebsiteId = websiteData.id
+        }
       }
     }
 
     // 处理自定义国家
     let finalCountryId = submission.country_id
     if (submission.custom_country && submission.custom_country.name && submission.custom_country.code) {
-      const { data: countryData, error: countryError } = await supabase
+      // 先检查是否已存在相同名称的国家
+      const { data: existingCountry, error: checkCountryError } = await supabase
         .from('countries')
-        .insert([{
-          name: submission.custom_country.name,
-          code: submission.custom_country.code.toLowerCase(),
-          phone_code: submission.custom_country.phone_code || ''
-        }])
-        .select()
-        .single()
+        .select('id')
+        .eq('name', submission.custom_country.name)
+        .maybeSingle()
       
-      if (!countryError && countryData) {
-        finalCountryId = countryData.id
+      if (existingCountry) {
+        finalCountryId = existingCountry.id
+      } else {
+        const { data: countryData, error: countryError } = await supabase
+          .from('countries')
+          .insert([{
+            name: submission.custom_country.name,
+            code: submission.custom_country.code.toLowerCase(),
+            phone_code: submission.custom_country.phone_code || ''
+          }])
+          .select()
+          .single()
+        
+        if (!countryError && countryData) {
+          finalCountryId = countryData.id
+        }
       }
     }
 
-    // 处理自定义项目
+// 处理自定义项目
     let finalProjectId = submission.project_id
     if (submission.custom_project && submission.custom_project.name && submission.custom_project.code) {
-      const { data: projectData, error: projectError } = await supabase
+      // 先检查是否已存在相同名称的项目
+      const { data: existingProject, error: checkProjectError } = await supabase
         .from('projects')
-        .insert([{
-          name: submission.custom_project.name,
-          code: submission.custom_project.code.toLowerCase()
-        }])
-        .select()
-        .single()
+        .select('id')
+        .eq('name', submission.custom_project.name)
+        .maybeSingle()
       
-      if (!projectError && projectData) {
-        finalProjectId = projectData.id
+      if (existingProject) {
+        finalProjectId = existingProject.id
+      } else {
+        const { data: projectData, error: projectError } = await supabase
+          .from('projects')
+          .insert([{
+            name: submission.custom_project.name,
+            code: submission.custom_project.code.toLowerCase()
+          }])
+          .select()
+          .single()
+        
+        if (!projectError && projectData) {
+          finalProjectId = projectData.id
+        }
       }
     }
 
