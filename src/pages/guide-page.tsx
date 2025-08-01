@@ -63,9 +63,14 @@ export default function GuidePage() {
     return matchesSearch && matchesWebsite && matchesCountry && matchesProject && matchesResult
   })
 
-  // 按结果分组
-  const failureSubmissions = filteredSubmissions.filter(s => s.result === 'failure')
-  const successSubmissions = filteredSubmissions.filter(s => s.result === 'success')
+  // 按时间排序，最新的在前面
+  const sortedSubmissions = filteredSubmissions.sort((a, b) => 
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
+  
+  // 统计数据
+  const failureCount = filteredSubmissions.filter(s => s.result === 'failure').length
+  const successCount = filteredSubmissions.filter(s => s.result === 'success').length
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -199,7 +204,7 @@ export default function GuidePage() {
           <Card className="bg-red-50/80 backdrop-blur-sm border-red-200 shadow-lg">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-red-600 mb-2">
-                {failureSubmissions.length}
+                {failureCount}
               </div>
               <div className="text-red-700 font-medium">失败记录</div>
               <div className="text-sm text-red-600 mt-1">需要避开的组合</div>
@@ -209,7 +214,7 @@ export default function GuidePage() {
           <Card className="bg-green-50/80 backdrop-blur-sm border-green-200 shadow-lg">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-green-600 mb-2">
-                {successSubmissions.length}
+                {successCount}
               </div>
               <div className="text-green-700 font-medium">成功记录</div>
               <div className="text-sm text-green-600 mt-1">可以参考的组合</div>
@@ -227,84 +232,31 @@ export default function GuidePage() {
           </Card>
         </div>
 
-        {/* 失败记录 - 优先显示 */}
-        {failureSubmissions.length > 0 && (
+        {/* 所有记录 - 按时间排序 */}
+        {sortedSubmissions.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-red-600 mb-4 flex items-center gap-2">
-              <AlertTriangle className="h-6 w-6" />
-              ⚠️ 失败记录 - 建议避开
+            <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+              📋 所有记录 - 按时间排序
             </h2>
             <div className="grid gap-4">
-              {failureSubmissions.map(submission => (
-                <Card key={submission.id} className="bg-red-50/80 backdrop-blur-sm border-red-200 shadow-lg hover:shadow-xl transition-shadow">
+              {sortedSubmissions.map(submission => (
+                <Card 
+                  key={submission.id} 
+                  className={`backdrop-blur-sm shadow-lg hover:shadow-xl transition-shadow ${
+                    submission.result === 'failure' 
+                      ? 'bg-red-50/80 border-red-200' 
+                      : 'bg-green-50/80 border-green-200'
+                  }`}
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="destructive">失败</Badge>
-                          <div className="flex items-center gap-1 text-sm text-gray-500">
-                            <Clock className="h-4 w-4" />
-                            {formatDate(submission.created_at)}
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">网站:</span>
-                            <div className="flex items-center gap-1">
-                              <span>{submission.website?.name}</span>
-                              {submission.website?.status === 'personal' && (
-                                <div className="flex items-center gap-1">
-                                  <User className="h-3 w-3 text-blue-600" />
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
-                                </div>
-                              )}
-                            </div>
-                            {submission.website?.url && (
-                              <a 
-                                href={submission.website.url} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800"
-                              >
-                                <ExternalLink className="h-4 w-4" />
-                              </a>
-                            )}
-                          </div>
-                          <div>
-                            <span className="font-medium">国家:</span> {submission.country?.name} ({submission.country?.code})
-                          </div>
-                          <div>
-                            <span className="font-medium">项目:</span> {submission.project?.name}
-                          </div>
-                          {submission.note && (
-                            <div className="mt-2 p-3 bg-white/50 rounded-lg">
-                              <span className="font-medium">备注:</span> {submission.note}
-                            </div>
+                          {submission.result === 'failure' ? (
+                            <Badge variant="destructive">失败</Badge>
+                          ) : (
+                            <Badge className="bg-green-100 text-green-800 border-green-300">成功</Badge>
                           )}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* 成功记录 */}
-        {successSubmissions.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-green-600 mb-4 flex items-center gap-2">
-              ✅ 成功记录 - 可以参考
-            </h2>
-            <div className="grid gap-4">
-              {successSubmissions.map(submission => (
-                <Card key={submission.id} className="bg-green-50/80 backdrop-blur-sm border-green-200 shadow-lg hover:shadow-xl transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge className="bg-green-100 text-green-800 border-green-300">成功</Badge>
                           <div className="flex items-center gap-1 text-sm text-gray-500">
                             <Clock className="h-4 w-4" />
                             {formatDate(submission.created_at)}
@@ -355,7 +307,7 @@ export default function GuidePage() {
         )}
 
         {/* 无数据提示 */}
-        {filteredSubmissions.length === 0 && (
+        {sortedSubmissions.length === 0 && (
           <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
             <CardContent className="p-12 text-center">
               <AlertTriangle className="h-16 w-16 text-gray-400 mx-auto mb-4" />

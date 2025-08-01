@@ -102,8 +102,7 @@ export async function getSubmissions(
   const offset = (page - 1) * pageSize
   
   const { data, error, count } = await query
-    .order('result', { ascending: true }) // 失败记录优先
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: false }) // 按时间倒序，最新的在前面
     .range(offset, offset + pageSize - 1)
   
   if (error) {
