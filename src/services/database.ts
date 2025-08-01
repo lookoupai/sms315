@@ -159,7 +159,7 @@ export async function createSubmission(submission: {
     let finalWebsiteId = submission.website_id
     if (submission.custom_website && submission.custom_website.name && submission.custom_website.url) {
       // 先检查是否已存在相同名称的网站
-      const { data: existingWebsite, error: checkWebsiteError } = await supabase
+      const { data: existingWebsite } = await supabase
         .from('websites')
         .select('id')
         .eq('name', submission.custom_website.name)
@@ -188,7 +188,7 @@ export async function createSubmission(submission: {
     let finalCountryId = submission.country_id
     if (submission.custom_country && submission.custom_country.name && submission.custom_country.code) {
       // 先检查是否已存在相同名称的国家
-      const { data: existingCountry, error: checkCountryError } = await supabase
+      const { data: existingCountry } = await supabase
         .from('countries')
         .select('id')
         .eq('name', submission.custom_country.name)
@@ -217,7 +217,7 @@ export async function createSubmission(submission: {
     let finalProjectId = submission.project_id
     if (submission.custom_project && submission.custom_project.name && submission.custom_project.code) {
       // 先检查是否已存在相同名称的项目
-      const { data: existingProject, error: checkProjectError } = await supabase
+      const { data: existingProject } = await supabase
         .from('projects')
         .select('id')
         .eq('name', submission.custom_project.name)
