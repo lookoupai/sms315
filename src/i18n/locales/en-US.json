@@ -63,6 +63,8 @@
     "unknownProject": "Unknown Project",
     "includePersonal": "Include Personal Services",
     "includeScammer": "Show Scammers",
+    "showScammers": "Show Scammers",
+    "showScammersDesc": "Show websites or individuals marked as scammers",
     "personalServices": "Personal SMS providers, private card sites, etc.",
     "scammerServices": "Scammers who only take money without providing services",
     "personalServiceBadge": "Personal",
@@ -95,6 +97,7 @@
     "showPersonalServices": "Show Personal Services",
     "personalServicesDesc": "Personal SMS providers, private card sites, etc.",
     "customWebsite": "🔧 Custom Website",
+    "customWebsiteButton": "Custom Website",
     "customWebsiteInfo": "Custom Website Information",
     "websiteNamePlaceholder": "Website name, e.g.: NewSMS",
     "websiteUrlPlaceholder": "Website URL, e.g.: https://newsms.com",
@@ -138,7 +141,11 @@
     "searchProjects": "Search project name...",
     "noWebsitesFound": "No matching websites found",
     "noCountriesFound": "No matching countries found",
-    "noProjectsFound": "No matching projects found"
+    "noProjectsFound": "No matching projects found",
+    "personalServiceTag": "Personal",
+    "scammerTag": "Scammer",
+    "regularWebsiteDesc": "Regular SMS websites with platform guarantee",
+    "customWebsiteDesc": "If not in the list, it means no one has submitted it yet. Please click Custom Website to submit information"
   },
   "admin": {
     "title": "Admin Panel",
