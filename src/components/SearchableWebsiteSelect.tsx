@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { ChevronDown, Search, Plus, User } from 'lucide-react'
+import { ChevronDown, Search, Plus, User, AlertTriangle } from 'lucide-react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import type { Website } from '../lib/supabase'
@@ -10,6 +10,7 @@ interface SearchableWebsiteSelectProps {
   onValueChange: (value: string) => void
   placeholder?: string
   includePersonal?: boolean
+  includeScammer?: boolean
 }
 
 export default function SearchableWebsiteSelect({
@@ -17,7 +18,8 @@ export default function SearchableWebsiteSelect({
   value,
   onValueChange,
   placeholder = "请选择网站",
-  includePersonal = false
+  includePersonal = false,
+  includeScammer = false
 }: SearchableWebsiteSelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -28,8 +30,12 @@ export default function SearchableWebsiteSelect({
     const matchesSearch = website.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          website.url.toLowerCase().includes(searchTerm.toLowerCase())
     
-    // 如果不包含个人服务，则过滤掉个人服务
+    // 根据筛选条件过滤
     if (!includePersonal && website.status === 'personal') {
+      return false
+    }
+    
+    if (!includeScammer && website.status === 'scammer') {
       return false
     }
     
@@ -72,9 +78,15 @@ export default function SearchableWebsiteSelect({
               {selectedWebsite.status === 'personal' && (
                 <User className="h-4 w-4 text-blue-600" />
               )}
+              {selectedWebsite.status === 'scammer' && (
+                <AlertTriangle className="h-4 w-4 text-red-600" />
+              )}
               <span className="truncate">{selectedWebsite.name}</span>
               {selectedWebsite.status === 'personal' && (
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
+              )}
+              {selectedWebsite.status === 'scammer' && (
+                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">骗子</span>
               )}
             </>
           ) : (
@@ -123,6 +135,9 @@ export default function SearchableWebsiteSelect({
                         {website.status === 'personal' && (
                           <User className="h-4 w-4 text-blue-600 flex-shrink-0" />
                         )}
+                        {website.status === 'scammer' && (
+                          <AlertTriangle className="h-4 w-4 text-red-600 flex-shrink-0" />
+                        )}
                         <div className="min-w-0 flex-1">
                           <div className="font-medium truncate">{website.name}</div>
                           <div className="text-xs text-gray-500 truncate">{website.url}</div>
@@ -132,6 +147,11 @@ export default function SearchableWebsiteSelect({
                         {website.status === 'personal' && (
                           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded flex-shrink-0">
                             个人
+                          </span>
+                        )}
+                        {website.status === 'scammer' && (
+                          <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded flex-shrink-0">
+                            骗子
                           </span>
                         )}
                         {website.status === 'pending' && (

@@ -64,3 +64,7 @@ Icon?
 *.tar.gz
 .cache/
 .parcel-cache/
+
+# CodeBuddy 相关文件
+.codebuddy/
+.codebuddy/.ignored_image/

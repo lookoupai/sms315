@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -29,7 +29,8 @@ const GuideListPage = () => {
     country: 'all',
     project: 'all'
   })
-  const [includePersonal, setIncludePersonal] = useState(false)
+  const [includePersonal, setIncludePersonal] = useState(true)
+  const [includeScammer, setIncludeScammer] = useState(true)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   
@@ -44,7 +45,7 @@ const GuideListPage = () => {
     const loadBasicData = async () => {
       try {
         const [websitesData, countriesData, projectsData] = await Promise.all([
-          getWebsites(includePersonal),
+          getWebsites(includePersonal, includeScammer), // 同时传入两个参数
           getCountries(),
           getProjects()
         ])
@@ -56,7 +57,7 @@ const GuideListPage = () => {
       }
     }
     loadBasicData()
-  }, [includePersonal])
+  }, [includePersonal, includeScammer]) // 添加 includeScammer 作为依赖
 
   // 当语言或国家数据变化时，更新本地化的国家列表
   useEffect(() => {
@@ -103,17 +104,21 @@ const GuideListPage = () => {
   useEffect(() => {
     let filtered = submissions
 
-    // 个人服务过滤 - 如果不包含个人服务，则过滤掉个人服务的记录
-    if (!includePersonal) {
-      filtered = filtered.filter(item => 
-        !item.website || item.website.status !== 'personal'
-      )
-    }
+    // 服务类型过滤
+    filtered = filtered.filter(item => {
+      if (!item.website) return true;
+      
+      if (item.website.status === 'personal' && !includePersonal) return false;
+      if (item.website.status === 'scammer' && !includeScammer) return false;
+      
+      return true;
+    });
 
-    // 搜索过滤 - 支持网站、国家名称、国家代码、电话区号、项目、备注
+    // 搜索过滤 - 支持网站名称、网站URL、国家名称、国家代码、电话区号、项目、备注
     if (filters.search) {
       filtered = filtered.filter(item =>
         (item.website?.name && item.website.name.toLowerCase().includes(filters.search.toLowerCase())) ||
+        (item.website?.url && item.website.url.toLowerCase().includes(filters.search.toLowerCase())) ||
         (item.country?.name && item.country.name.toLowerCase().includes(filters.search.toLowerCase())) ||
         (item.country?.code && item.country.code.toLowerCase().includes(filters.search.toLowerCase())) ||
         (item.country?.phone_code && item.country.phone_code.includes(filters.search)) ||
@@ -121,18 +126,54 @@ const GuideListPage = () => {
         (item.note && item.note.toLowerCase().includes(filters.search.toLowerCase()))
       )
     }
+    
+    // 网站筛选
+    if (filters.website && filters.website !== 'all') {
+      // 从 value 中提取网站名称（格式为 "name_id"）
+      const websiteName = filters.website.split('_')[0];
+      filtered = filtered.filter(item => 
+        item.website?.name === websiteName
+      );
+    }
+    
+    // 国家筛选
+    if (filters.country && filters.country !== 'all') {
+      filtered = filtered.filter(item => 
+        item.country?.name === filters.country
+      );
+    }
+    
+    // 项目筛选
+    if (filters.project && filters.project !== 'all') {
+      filtered = filtered.filter(item => 
+        item.project?.name === filters.project
+      );
+    }
 
     setFilteredSubmissions(filtered)
-  }, [submissions, filters.search, includePersonal])
+  }, [submissions, filters, includePersonal, includeScammer])
+
+  // 搜索输入
+  const [searchTerm, setSearchTerm] = useState('');
 
   // 处理筛选器变化
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
-    // 重置到第一页
-    if (key !== 'search') {
-      setCurrentPage(1)
-      loadSubmissions(1, false)
+    // 更新筛选条件
+    setFilters(prev => ({ ...prev, [key]: value }));
+    
+    // 对于结果筛选，我们需要重新加载数据
+    if (key === 'result') {
+      // 重置到第一页
+      setCurrentPage(1);
+      loadSubmissions(1, false);
     }
+    // 对于网站、国家和项目筛选，我们在前端进行筛选，不需要重新加载数据
+  }
+  
+  // 处理搜索提交
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setFilters(prev => ({ ...prev, search: searchTerm }));
   }
 
   // 处理页面变化
@@ -233,32 +274,57 @@ const GuideListPage = () => {
         </Card>
       </div>
 
-      {/* 个人服务开关 - 独立区域 */}
+      {/* 服务类型筛选 - 独立区域 */}
       <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
         <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-blue-900">{t('submit.personalService')}</h3>
+                  <p className="text-sm text-blue-700">{t('submit.personalServiceDesc')}</p>
                 </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-blue-900">{t('submit.personalService')}</h3>
-                <p className="text-sm text-blue-700">{t('submit.personalServiceDesc')}</p>
-              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includePersonal}
+                  onChange={(e) => setIncludePersonal(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={includePersonal}
-                onChange={(e) => setIncludePersonal(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
+            
+            <div className="flex items-center justify-between border-t border-blue-200 pt-4">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-red-900">显示骗子</h3>
+                  <p className="text-sm text-red-700">显示被标记为骗子的网站或个人</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={includeScammer}
+                  onChange={(e) => setIncludeScammer(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+              </label>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -287,15 +353,40 @@ const GuideListPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">{t('common.search')}</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder={t('guide.searchPlaceholder')}
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="pl-10 min-h-[44px]"
-                />
-              </div>
+              <form onSubmit={handleSearchSubmit} className="w-full">
+                <div className="relative flex">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder={t('guide.searchPlaceholder')}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-8 min-h-[44px] w-full rounded-r-none"
+                    />
+                    {searchTerm && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSearchTerm('');
+                          setFilters(prev => ({ ...prev, search: '' }));
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                  <Button 
+                    type="submit" 
+                    className="rounded-l-none"
+                  >
+                    搜索
+                  </Button>
+                </div>
+              </form>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">{t('guide.resultType')}</label>
@@ -316,7 +407,7 @@ const GuideListPage = () => {
                 options={[
                   { value: 'all', label: t('guide.allWebsites') },
                   ...websites.map(website => ({
-                    value: website.name,
+                    value: `${website.name}_${website.id}`, // 使用网站名称和ID组合作为唯一值
                     label: website.name
                   }))
                 ]}
@@ -392,12 +483,18 @@ const GuideListPage = () => {
                         <span className="font-medium text-gray-700">{t('guide.websiteLabel')}</span>
                         <div className="flex items-center space-x-1 mt-1">
                           <div className="flex items-center space-x-2">
-                            {submission.website?.status === 'personal' && (
+                          {submission.website?.status === 'personal' && (
                               <div className="flex items-center space-x-1">
                                 <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                 </svg>
                                 <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">个人</Badge>
+                              </div>
+                            )}
+                          {submission.website?.status === 'scammer' && (
+                              <div className="flex items-center space-x-1">
+                                <AlertTriangle className="h-4 w-4 text-red-600" />
+                                <Badge variant="destructive" className="text-xs">骗子</Badge>
                               </div>
                             )}
                             <span>{submission.website?.name || t('guide.unknownWebsite')}</span>
@@ -423,7 +520,10 @@ const GuideListPage = () => {
                         <div className="mt-1">
                           <span>
                             {submission.country 
-                              ? localizedCountries.find(c => c.id === submission.country?.id)?.localizedName || submission.country.name
+                              ? localizedCountries.find(c => c.id === submission.country?.id)?.localizedName || 
+                                (submission.country.name && /^[a-zA-Z\s\(\)]+$/.test(submission.country.name) 
+                                  ? submission.country.name 
+                                  : t('guide.unknownCountry'))
                               : t('guide.unknownCountry')
                             }
                           </span>

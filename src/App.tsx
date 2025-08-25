@@ -4,7 +4,7 @@ import { Toaster } from "./components/ui/toaster";
 import Layout from "./layout";
 import GuideListPage from "./pages/guide-list-page";
 import AdminPage from "./pages/admin-page";
-import SubmitPageNew from "./pages/submit-page-new";
+import SubmitPage from "./pages/submit-page";
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<GuideListPage />} />
-          <Route path="/submit" element={<SubmitPageNew />} />
+          <Route path="/submit" element={<SubmitPage />} />
           <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </Layout>

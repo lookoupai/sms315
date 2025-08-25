@@ -2,18 +2,17 @@ import { supabase } from '../lib/supabase'
 import type { Website, Country, Project, Submission } from '../lib/supabase'
 
 // 获取所有网站
-export async function getWebsites(includePersonal: boolean = false): Promise<Website[]> {
+export async function getWebsites(includePersonal: boolean = false, includeScammer: boolean = false): Promise<Website[]> {
   let query = supabase
     .from('websites')
     .select('*')
   
-  if (includePersonal) {
-    // 包含个人服务：显示 active 和 personal 状态
-    query = query.in('status', ['active', 'personal'])
-  } else {
-    // 默认只显示正规平台
-    query = query.eq('status', 'active')
-  }
+  // 构建状态筛选条件
+  const statusFilter = ['active'];
+  if (includePersonal) statusFilter.push('personal');
+  if (includeScammer) statusFilter.push('scammer');
+  
+  query = query.in('status', statusFilter);
   
   const { data, error } = await query.order('name')
   
@@ -167,12 +166,15 @@ export async function createSubmission(submission: {
       if (existingWebsite) {
         finalWebsiteId = existingWebsite.id
       } else {
+        // 根据提交的类型设置状态
+        const websiteStatus = submission.custom_website.status || 'pending';
+        
         const { data: websiteData, error: websiteError } = await supabase
           .from('websites')
           .insert([{
             name: submission.custom_website.name,
             url: submission.custom_website.url,
-            status: 'pending' // 待审核状态
+            status: websiteStatus // 使用提交的状态
           }])
           .select()
           .single()

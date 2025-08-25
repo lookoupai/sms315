@@ -376,16 +376,21 @@ export function getLocalizedCountries<T extends { name: string; code?: string }>
     // 如果有code字段，直接使用
     if (country.code && typeof Intl !== 'undefined' && Intl.DisplayNames) {
       try {
-        const displayNames = new Intl.DisplayNames([locale], { type: 'region' })
-        const localizedName = displayNames.of(country.code.toUpperCase())
-        if (localizedName && localizedName !== country.code.toUpperCase()) {
-          return {
-            ...country,
-            localizedName
+        // 确保国家代码是有效的 ISO 3166-1 alpha-2 格式（两个字母）
+        const countryCode = country.code.trim().toUpperCase();
+        if (/^[A-Z]{2}$/.test(countryCode)) {
+          const displayNames = new Intl.DisplayNames([locale], { type: 'region' })
+          const localizedName = displayNames.of(countryCode)
+          if (localizedName && localizedName !== countryCode) {
+            return {
+              ...country,
+              localizedName
+            }
           }
         }
       } catch (error) {
-        console.warn('Direct code translation failed:', country.code, error)
+        // 错误处理，但不打印详细错误，避免控制台污染
+        console.warn('无法本地化国家代码:', country.code)
       }
     }
     
