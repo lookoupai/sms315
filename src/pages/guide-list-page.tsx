@@ -383,7 +383,7 @@ const GuideListPage = () => {
                     type="submit" 
                     className="rounded-l-none"
                   >
-                    搜索
+                    {t('common.search')}
                   </Button>
                 </div>
               </form>
