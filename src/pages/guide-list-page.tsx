@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -311,8 +311,8 @@ const GuideListPage = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-red-900">显示骗子</h3>
-                  <p className="text-sm text-red-700">显示被标记为骗子的网站或个人</p>
+                  <h3 className="font-semibold text-red-900">{t('guide.showScammers')}</h3>
+                  <p className="text-sm text-red-700">{t('guide.showScammersDesc')}</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -488,13 +488,13 @@ const GuideListPage = () => {
                                 <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                                 </svg>
-                                <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">个人</Badge>
+                                <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">{t('guide.personalServiceBadge')}</Badge>
                               </div>
                             )}
                           {submission.website?.status === 'scammer' && (
                               <div className="flex items-center space-x-1">
                                 <AlertTriangle className="h-4 w-4 text-red-600" />
-                                <Badge variant="destructive" className="text-xs">骗子</Badge>
+                                <Badge variant="destructive" className="text-xs">{t('guide.scammerBadge')}</Badge>
                               </div>
                             )}
                             <span>{submission.website?.name || t('guide.unknownWebsite')}</span>

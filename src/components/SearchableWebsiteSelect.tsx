@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, Search, Plus, User, AlertTriangle } from 'lucide-react'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -18,9 +19,10 @@ export default function SearchableWebsiteSelect({
   value,
   onValueChange,
   placeholder = "请选择网站",
-  includePersonal = false,
-  includeScammer = false
+  includePersonal = true,
+  includeScammer = true
 }: SearchableWebsiteSelectProps) {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -83,10 +85,10 @@ export default function SearchableWebsiteSelect({
               )}
               <span className="truncate">{selectedWebsite.name}</span>
               {selectedWebsite.status === 'personal' && (
-                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{t('submit.personalServiceTag')}</span>
               )}
               {selectedWebsite.status === 'scammer' && (
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">骗子</span>
+                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">{t('submit.scammerTag')}</span>
               )}
             </>
           ) : (
@@ -146,22 +148,22 @@ export default function SearchableWebsiteSelect({
                       <div className="flex items-center gap-1 ml-2">
                         {website.status === 'personal' && (
                           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded flex-shrink-0">
-                            个人
+                            {t('submit.personalServiceTag')}
                           </span>
                         )}
                         {website.status === 'scammer' && (
                           <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded flex-shrink-0">
-                            骗子
+                            {t('submit.scammerTag')}
                           </span>
                         )}
                         {website.status === 'pending' && (
                           <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded flex-shrink-0">
-                            待审核
+                            {t('submit.statusPending')}
                           </span>
                         )}
                         {website.status === 'inactive' && (
                           <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded flex-shrink-0">
-                            维护中
+                            {t('submit.statusInactive')}
                           </span>
                         )}
                       </div>

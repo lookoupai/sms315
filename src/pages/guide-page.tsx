@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Button } from '../components/ui/button'
@@ -9,6 +10,7 @@ import { getSubmissions, getAllWebsitesForAdmin, getCountries, getProjects } fro
 import type { Submission, Website, Country, Project } from '../lib/supabase'
 
 export default function GuidePage() {
+  const { t } = useTranslation()
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [websites, setWebsites] = useState<Website[]>([])
   const [countries, setCountries] = useState<Country[]>([])
@@ -270,7 +272,7 @@ export default function GuidePage() {
                               {submission.website?.status === 'personal' && (
                                 <div className="flex items-center gap-1">
                                   <User className="h-3 w-3 text-blue-600" />
-                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
+                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{t('guide.personalServiceBadge')}</span>
                                 </div>
                               )}
                             </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { UrlLinkReplacer, SmartLinkReplacer } from '../components/link-replacer'
 import type { Submission } from '../lib/supabase';
 
 export default function HomePage() {
+  const { t } = useTranslation()
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -159,7 +161,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-3">
                   <User className="h-5 w-5" style={{ color: '#3b82f6' }} />
                   <span className="text-sm font-medium" style={{ color: '#1e40af' }}>
-                    显示个人服务
+                    {t('guide.includePersonal')}
                   </span>
                   <span 
                     className="text-xs px-2 py-1 rounded"
@@ -168,7 +170,7 @@ export default function HomePage() {
                       color: '#1d4ed8' 
                     }}
                   >
-                    个人接码者、私人发卡网站等
+                    {t('guide.personalServices')}
                   </span>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -257,7 +259,7 @@ export default function HomePage() {
                             {submission.website?.status === 'personal' && (
                               <>
                                 <User className="h-3 w-3 text-blue-600 ml-2" />
-                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">个人</span>
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">{t('guide.personalServiceBadge')}</span>
                               </>
                             )}
                           </div>

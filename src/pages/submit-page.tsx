@@ -74,7 +74,7 @@ function InlineSearchableWebsiteSelect({
               <svg className="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">个人</span>
+              <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">{t('submit.personalServiceTag')}</span>
             </div>
           )}
           <span>
@@ -137,7 +137,7 @@ function InlineSearchableWebsiteSelect({
                           <svg className="h-3 w-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                           </svg>
-                          <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">个人</span>
+                          <span className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded">{t('submit.personalServiceTag')}</span>
                         </div>
                       )}
                       <span>
@@ -460,7 +460,7 @@ export default function SubmitPage() {
                 {/* 服务类型选择 */}
                 <div className="mb-4">
                   <Label className="text-sm font-medium mb-2 block">
-                    服务类型 <span className="text-red-500">*</span>
+                    {t('submit.serviceType')} <span className="text-red-500">{t('submit.required')}</span>
                   </Label>
                   <div className="grid grid-cols-3 gap-3">
                     <label className={`flex items-center justify-center p-3 border-2 rounded-lg cursor-pointer transition-colors ${
@@ -482,7 +482,7 @@ export default function SubmitPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9" />
                           </svg>
                         </div>
-                        <div className="font-medium text-sm">网站</div>
+                        <div className="font-medium text-sm">{t('submit.websiteServiceType')}</div>
                       </div>
                     </label>
                     
@@ -505,7 +505,7 @@ export default function SubmitPage() {
                             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                           </svg>
                         </div>
-                        <div className="font-medium text-sm">个人服务</div>
+                        <div className="font-medium text-sm">{t('submit.personalServiceType')}</div>
                       </div>
                     </label>
                     
@@ -526,14 +526,14 @@ export default function SubmitPage() {
                         <div className="w-8 h-8 mx-auto mb-1 flex items-center justify-center rounded-full bg-red-100">
                           <AlertTriangle className="h-5 w-5 text-red-600" />
                         </div>
-                        <div className="font-medium text-sm">骗子</div>
+                        <div className="font-medium text-sm">{t('submit.scammerServiceType')}</div>
                       </div>
                     </label>
                   </div>
                   <div className="mt-2 text-xs text-gray-500">
-                    {websiteType === 'website' && '正规接码网站，有平台保障。如果选择列表没有，说明还没有人提交过，请点击自定义网站，自行提交信息'}
-                    {websiteType === 'personal' && '个人提供的接码服务。如果选择列表没有，说明还没有人提交过，请点击自定义网站，自行提交信息'}
-                    {websiteType === 'scammer' && '只收钱不提供服务的骗子，提交后可以帮助他人避坑，如果骗子联系方式是telegram，建议点击自定义网站，然后提交数字ID（因为用户名可以随便改，数字ID是固定不变的），例:网站名称填：https://t.me/jiema8889999 ，网站地址填：tg://user?id=6158602733'}
+                    {websiteType === 'website' && t('submit.websiteServiceDesc')}
+                    {websiteType === 'personal' && t('submit.personalServiceDesc')}
+                    {websiteType === 'scammer' && t('submit.scammerServiceDesc')}
                   </div>
                 </div>
                 
@@ -543,9 +543,9 @@ export default function SubmitPage() {
                     <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
-                    <span className="text-sm font-medium text-blue-800">包含个人服务和骗子</span>
+                    <span className="text-sm font-medium text-blue-800">{t('submit.includePersonalAndScammer')}</span>
                     <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                      个人接码者、私人发卡网站和已知骗子
+                      {t('submit.personalAndScammerDesc')}
                     </span>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -662,7 +662,7 @@ export default function SubmitPage() {
                         maxLength={2}
                       />
                       {customCountry.code && !/^[A-Za-z]{2}$/.test(customCountry.code) && (
-                        <p className="text-xs text-red-500">国家代码必须是两个字母的ISO代码（如CN、US）</p>
+                        <p className="text-xs text-red-500">{t('submit.countryCodeValidation')}</p>
                       )}
                     </div>
                     <Input
