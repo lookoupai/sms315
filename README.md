@@ -7,6 +7,7 @@
 ### 🎯 核心功能
 - **避坑指南查看** - 浏览其他用户分享的接码失败记录
 - **智能筛选搜索** - 按网站、国家、项目快速筛选
+- **骗子信息标记** - 区分普通网站、个人服务和骗子信息
 - **失败记录提交** - 分享你的接码失败经验
 - **数据统计展示** - 查看失败率统计和热门组合
 - **智能链接替换** - 自动将原始链接替换为推广链接，增加收益转化
@@ -121,6 +122,15 @@ submissions
 ├── country_id → countries.id
 └── project_id → projects.id
 ```
+
+### 网站状态类型
+
+- **active** - 正常网站
+- **personal** - 个人服务
+- **scammer** - 骗子（只收钱不提供服务）
+- **pending** - 待审核
+- **inactive** - 维护中
+- **discontinued** - 已关闭
 
 ## 🚀 部署指南
 
@@ -255,9 +265,11 @@ CREATE TABLE link_replacements (
 - 智能筛选和搜索
 - 统计数据展示
 - 自动链接替换（蓝色可点击链接）
+- 骗子信息标记（红色警告标识）
 
 ### 提交页面
 - 表单填写界面
+- 服务类型选择（网站、个人服务、骗子）
 - 搜索建议功能
 - 移动端优化
 - 备注中的链接自动替换
@@ -382,8 +394,8 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ## 📞 联系方式
 
-- 项目地址: https://github.com/你的用户名/sms-avoid-guide
-- 问题反馈: https://github.com/你的用户名/sms-avoid-guide/issues
+- 项目地址: https://github.com/lookoupai/sms315
+- 问题反馈: https://github.com/lookoupai/sms315/issues
 
 ---
 
