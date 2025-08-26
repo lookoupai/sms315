@@ -5,6 +5,7 @@ import Layout from "./layout";
 import GuideListPage from "./pages/guide-list-page";
 import AdminPage from "./pages/admin-page";
 import SubmitPage from "./pages/submit-page";
+import TelegramTestPage from "./pages/telegram-test";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<GuideListPage />} />
           <Route path="/submit" element={<SubmitPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/telegram-test" element={<TelegramTestPage />} />
         </Routes>
       </Layout>
       <Toaster />

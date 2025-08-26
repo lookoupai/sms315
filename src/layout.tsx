@@ -5,13 +5,15 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { AlertTriangle, Home, List } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { useTelegram } from '@/hooks/useTelegram'
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation()
   const { t } = useTranslation()
+  const { isTelegram } = useTelegram()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className={`min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 ${isTelegram ? 'telegram-app' : ''}`}>
       {/* 顶部导航 */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="container mx-auto px-4 py-2 md:py-3">

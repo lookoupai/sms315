@@ -3,6 +3,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Telegram WebApp 适配样式 */
+.telegram-app {
+  /* 移除默认的页面边距，充分利用屏幕空间 */
+  padding: 0;
+}
+
+.telegram-app header {
+  /* 在 Telegram 中可以选择隐藏或简化头部 */
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.telegram-app footer {
+  /* 在 Telegram 中可以选择隐藏底部 */
+  margin-top: 2rem;
+}
+
+/* 针对 Telegram 的触摸优化 */
+.telegram-app button,
+.telegram-app a {
+  min-height: 44px; /* 确保触摸目标足够大 */
+}
+
+/* Telegram 主题适配 */
+@media (prefers-color-scheme: dark) {
+  .telegram-app {
+    --background: 212 212 216;
+    --foreground: 255 255 255;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
