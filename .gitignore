@@ -21,6 +21,7 @@ dist-ssr/
 *.njsproj
 *.sln
 *.sw?
+.kilocode/
 
 # 环境变量文件（重要：保护敏感信息）
 .env

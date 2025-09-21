@@ -167,14 +167,14 @@ export async function createSubmission(submission: {
         finalWebsiteId = existingWebsite.id
       } else {
         // 根据提交的类型设置状态
-        const websiteStatus = submission.custom_website.status || 'pending';
+        const websiteStatus = 'pending';
         
         const { data: websiteData, error: websiteError } = await supabase
           .from('websites')
           .insert([{
             name: submission.custom_website.name,
             url: submission.custom_website.url,
-            status: websiteStatus // 使用提交的状态
+            status: websiteStatus
           }])
           .select()
           .single()
@@ -313,6 +313,212 @@ export async function checkIpLimit(ip_address: string): Promise<boolean> {
     .eq('ip_address', ip_address)
   
   return true
+}
+
+// 获取单个提交记录详情
+export async function getSubmissionById(id: string): Promise<Submission | null> {
+  const { data, error } = await supabase
+    .from('submissions')
+    .select(`
+      *,
+      website:websites(*),
+      country:countries(*),
+      project:projects(*)
+    `)
+    .eq('id', id)
+    .single()
+  
+  if (error) {
+    console.error('获取提交记录详情失败:', error)
+    return null
+  }
+  
+  return data
+}
+
+// 获取网站的所有提交记录
+export async function getSubmissionsByWebsiteId(
+  websiteId: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<{ data: Submission[]; total: number; hasMore: boolean }> {
+  let query = supabase
+    .from('submissions')
+    .select(`
+      *,
+      website:websites(*),
+      country:countries(*),
+      project:projects(*)
+    `, { count: 'exact' })
+    .eq('website_id', websiteId)
+
+  const offset = (page - 1) * pageSize
+  
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(offset, offset + pageSize - 1)
+  
+  if (error) {
+    console.error('获取网站提交记录失败:', error)
+    return { data: [], total: 0, hasMore: false }
+  }
+  
+  const total = count || 0
+  const hasMore = offset + pageSize < total
+  
+  return {
+    data: data || [],
+    total,
+    hasMore
+  }
+}
+
+// 获取国家的所有提交记录
+export async function getSubmissionsByCountryCode(
+  countryCode: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<{ data: Submission[]; total: number; hasMore: boolean }> {
+  // 首先获取国家ID
+  const { data: countryData, error: countryError } = await supabase
+    .from('countries')
+    .select('id')
+    .eq('code', countryCode)
+    .single()
+  
+  if (countryError || !countryData) {
+    console.error('获取国家ID失败:', countryError)
+    return { data: [], total: 0, hasMore: false }
+  }
+  
+  // 然后使用国家ID查询提交记录
+  let query = supabase
+    .from('submissions')
+    .select(`
+      *,
+      website:websites(*),
+      country:countries(*),
+      project:projects(*)
+    `, { count: 'exact' })
+    .eq('country_id', countryData.id)
+
+  const offset = (page - 1) * pageSize
+  
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(offset, offset + pageSize - 1)
+  
+  if (error) {
+    console.error('获取国家提交记录失败:', error)
+    return { data: [], total: 0, hasMore: false }
+  }
+  
+  const total = count || 0
+  const hasMore = offset + pageSize < total
+  
+  return {
+    data: data || [],
+    total,
+    hasMore
+  }
+}
+
+// 获取项目的所有提交记录
+export async function getSubmissionsByProjectCode(
+  projectCode: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<{ data: Submission[]; total: number; hasMore: boolean }> {
+  // 首先获取项目ID
+  const { data: projectData, error: projectError } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('code', projectCode)
+    .single()
+  
+  if (projectError || !projectData) {
+    console.error('获取项目ID失败:', projectError)
+    return { data: [], total: 0, hasMore: false }
+  }
+  
+  // 然后使用项目ID查询提交记录
+  let query = supabase
+    .from('submissions')
+    .select(`
+      *,
+      website:websites(*),
+      country:countries(*),
+      project:projects(*)
+    `, { count: 'exact' })
+    .eq('project_id', projectData.id)
+
+  const offset = (page - 1) * pageSize
+  
+  const { data, error, count } = await query
+    .order('created_at', { ascending: false })
+    .range(offset, offset + pageSize - 1)
+  
+  if (error) {
+    console.error('获取项目提交记录失败:', error)
+    return { data: [], total: 0, hasMore: false }
+  }
+  
+  const total = count || 0
+  const hasMore = offset + pageSize < total
+  
+  return {
+    data: data || [],
+    total,
+    hasMore
+  }
+}
+
+// 获取单个网站详情
+export async function getWebsiteById(id: string): Promise<Website | null> {
+  const { data, error } = await supabase
+    .from('websites')
+    .select('*')
+    .eq('id', id)
+    .single()
+  
+  if (error) {
+    console.error('获取网站详情失败:', error)
+    return null
+  }
+  
+  return data
+}
+
+// 获取单个国家详情
+export async function getCountryByCode(code: string): Promise<Country | null> {
+  const { data, error } = await supabase
+    .from('countries')
+    .select('*')
+    .eq('code', code)
+    .single()
+  
+  if (error) {
+    console.error('获取国家详情失败:', error)
+    return null
+  }
+  
+  return data
+}
+
+// 获取单个项目详情
+export async function getProjectByCode(code: string): Promise<Project | null> {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('code', code)
+    .single()
+  
+  if (error) {
+    console.error('获取项目详情失败:', error)
+    return null
+  }
+  
+  return data
 }
 
 // 获取用户IP地址

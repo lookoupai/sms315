@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -474,7 +475,12 @@ const GuideListPage = () => {
                       </div>
                       <span className="text-sm text-gray-500 flex items-center space-x-1">
                         <Clock className="h-3 w-3" />
-                        <span>{formatDate(submission.created_at)}</span>
+                        <Link
+                          to={`/record/${submission.id}`}
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          {formatDate(submission.created_at)}
+                        </Link>
                       </span>
                     </div>
                     
@@ -497,7 +503,16 @@ const GuideListPage = () => {
                                 <Badge variant="destructive" className="text-xs">{t('guide.scammerBadge')}</Badge>
                               </div>
                             )}
-                            <span>{submission.website?.name || t('guide.unknownWebsite')}</span>
+                            {submission.website ? (
+                              <Link
+                                to={`/website/${submission.website.id}`}
+                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                              >
+                                {submission.website.name}
+                              </Link>
+                            ) : (
+                              <span>{t('guide.unknownWebsite')}</span>
+                            )}
                           </div>
                           {submission.website?.url && (
                             <>
@@ -518,27 +533,42 @@ const GuideListPage = () => {
                       <div>
                         <span className="font-medium text-gray-700">{t('guide.countryLabel')}</span>
                         <div className="mt-1">
-                          <span>
-                            {submission.country 
-                              ? localizedCountries.find(c => c.id === submission.country?.id)?.localizedName || 
-                                (submission.country.name && /^[a-zA-Z\s\(\)]+$/.test(submission.country.name) 
-                                  ? submission.country.name 
-                                  : t('guide.unknownCountry'))
-                              : t('guide.unknownCountry')
-                            }
-                          </span>
-                          {submission.country?.code && (
-                            <span className="text-gray-500"> ({submission.country.code})</span>
-                          )}
-                          {submission.country?.phone_code && (
-                            <span className="text-gray-500"> {submission.country.phone_code}</span>
+                          {submission.country ? (
+                            <>
+                              <Link
+                                to={`/country/${submission.country.code}`}
+                                className="text-blue-600 hover:text-blue-800 hover:underline"
+                              >
+                                {localizedCountries.find(c => c.id === submission.country?.id)?.localizedName ||
+                                  (submission.country.name && /^[a-zA-Z\s\(\)]+$/.test(submission.country.name)
+                                    ? submission.country.name
+                                    : t('guide.unknownCountry'))}
+                              </Link>
+                              {submission.country.code && (
+                                <span className="text-gray-500"> ({submission.country.code})</span>
+                              )}
+                              {submission.country.phone_code && (
+                                <span className="text-gray-500"> {submission.country.phone_code}</span>
+                              )}
+                            </>
+                          ) : (
+                            <span>{t('guide.unknownCountry')}</span>
                           )}
                         </div>
                       </div>
                       <div>
                         <span className="font-medium text-gray-700">{t('guide.projectLabel')}</span>
                         <div className="mt-1">
-                          <span>{submission.project?.name || t('guide.unknownProject')}</span>
+                          {submission.project ? (
+                            <Link
+                              to={`/project/${submission.project.code}`}
+                              className="text-blue-600 hover:text-blue-800 hover:underline"
+                            >
+                              {submission.project.name}
+                            </Link>
+                          ) : (
+                            <span>{t('guide.unknownProject')}</span>
+                          )}
                         </div>
                       </div>
                     </div>

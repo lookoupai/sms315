@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { AlertTriangle, Send, Heart, Shield, Search, Filter, TrendingUp, Users, User } from 'lucide-react';
 import { getSubmissions } from '../services/database';
-import { useNavigate } from 'react-router-dom';
 import AdDisplay from '../components/ad-display';
 import { UrlLinkReplacer, SmartLinkReplacer } from '../components/link-replacer';
 
@@ -241,11 +241,20 @@ export default function HomePage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <div className="flex items-center gap-1">
-                            <span className="font-medium text-gray-900">{submission.website?.name}</span>
+                            {submission.website ? (
+                              <Link
+                                to={`/website/${submission.website.id}`}
+                                className="font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                              >
+                                {submission.website.name}
+                              </Link>
+                            ) : (
+                              <span className="font-medium text-gray-900">{t('guide.unknownWebsite')}</span>
+                            )}
                             {submission.website?.url && (
                               <>
                                 <span className="text-gray-500">(</span>
-                                <UrlLinkReplacer 
+                                <UrlLinkReplacer
                                   href={submission.website.url}
                                   className="text-blue-600 hover:text-blue-800 underline text-sm"
                                   target="_blank"
@@ -264,9 +273,27 @@ export default function HomePage() {
                             )}
                           </div>
                           <span className="text-sm text-gray-500">•</span>
-                          <span className="text-sm text-gray-600">{submission.country?.name}</span>
+                          {submission.country ? (
+                            <Link
+                              to={`/country/${submission.country.code}`}
+                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                            >
+                              {submission.country.name}
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-gray-600">{t('guide.unknownCountry')}</span>
+                          )}
                           <span className="text-sm text-gray-500">•</span>
-                          <span className="text-sm text-gray-600">{submission.project?.name}</span>
+                          {submission.project ? (
+                            <Link
+                              to={`/project/${submission.project.code}`}
+                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                            >
+                              {submission.project.name}
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-gray-600">{t('guide.unknownProject')}</span>
+                          )}
                         </div>
                         {submission.result === 'failure' && submission.note && (
                           <p className="text-sm text-red-600 mt-1">
@@ -283,7 +310,12 @@ export default function HomePage() {
                           {submission.result === 'success' ? '成功' : '失败'}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {new Date(submission.created_at).toLocaleDateString('zh-CN')}
+                          <Link
+                            to={`/record/${submission.id}`}
+                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                          >
+                            {new Date(submission.created_at).toLocaleDateString('zh-CN')}
+                          </Link>
                         </span>
                       </div>
                     </div>

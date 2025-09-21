@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /sitemap.xml
+
+# 禁止爬取的路径
+Disallow: /admin
+Disallow: /telegram-test
+
+# 网站地图
+Sitemap: https://yoursite.com/sitemap.xml
