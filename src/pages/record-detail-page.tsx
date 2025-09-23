@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getLocalizedCountryName } from '../utils/country-names'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -13,7 +14,7 @@ import AdDisplay from '../components/ad-display'
 export default function RecordDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [submission, setSubmission] = useState<Submission | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,11 +29,11 @@ export default function RecordDetailPage() {
         if (data) {
           setSubmission(data)
         } else {
-          setError('记录不存在')
+          setError(t('detail.recordNotFound'))
         }
       } catch (err) {
         console.error('获取记录详情失败:', err)
-        setError('获取记录详情失败')
+        setError(t('detail.fetchRecordFailed'))
       } finally {
         setLoading(false)
       }
@@ -46,17 +47,18 @@ export default function RecordDetailPage() {
     const now = new Date()
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     
-    if (diffInHours < 1) return '刚刚'
-    if (diffInHours < 24) return `${diffInHours}小时前`
-    if (diffInHours < 24 * 7) return `${Math.floor(diffInHours / 24)}天前`
+    if (diffInHours < 1) return t('detail.justNow')
+    if (diffInHours < 24) return `${diffInHours}${t('detail.hoursAgo')}`
+    if (diffInHours < 24 * 7) return `${Math.floor(diffInHours / 24)}${t('detail.daysAgo')}`
     return date.toLocaleDateString('zh-CN')
   }
 
   // 页面标题和描述
   useEffect(() => {
     if (submission) {
-      const title = `${submission.website?.name || '未知网站'} - ${submission.country?.name || '未知国家'} - ${submission.project?.name || '未知项目'} - ${submission.result === 'success' ? '成功' : '失败'}记录`
-      const description = `用户分享的接码${submission.result === 'success' ? '成功' : '失败'}经历：网站${submission.website?.name}，国家${submission.country?.name}，项目${submission.project?.name}。${submission.note || '无备注'}`
+      const localizedCountryName = submission.country?.name ? getLocalizedCountryName(submission.country.name, i18n.language) : t('guide.unknownCountry')
+      const title = `${submission.website?.name || t('guide.unknownWebsite')} - ${localizedCountryName} - ${submission.project?.name || t('guide.unknownProject')} - ${submission.result === 'success' ? t('detail.success') : t('detail.failure')}记录`
+      const description = `用户分享的接码${submission.result === 'success' ? t('detail.success') : t('detail.failure')}经历：网站${submission.website?.name}，国家${localizedCountryName}，项目${submission.project?.name}。${submission.note || '无备注'}`
       
       document.title = `${title} - ${t('nav.title')}`
       
@@ -124,7 +126,7 @@ export default function RecordDetailPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">正在加载记录详情...</p>
+          <p className="text-gray-600">{t('detail.loadingRecord')}</p>
         </div>
       </div>
     )
@@ -136,10 +138,10 @@ export default function RecordDetailPage() {
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">错误</h3>
-            <p className="text-gray-600 mb-4">{error || '记录不存在'}</p>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('detail.error')}</h3>
+            <p className="text-gray-600 mb-4">{error || t('detail.recordNotFound')}</p>
             <Button onClick={() => navigate('/')}>
-              返回首页
+              {t('detail.backToHome')}
             </Button>
           </CardContent>
         </Card>
@@ -160,10 +162,10 @@ export default function RecordDetailPage() {
         <nav className="flex items-center space-x-2 text-sm mb-6">
           <Link to="/" className="flex items-center text-blue-600 hover:text-blue-800">
             <Home className="h-4 w-4 mr-1" />
-            首页
+            {t('detail.home')}
           </Link>
           <span className="text-gray-400">/</span>
-          <span className="text-gray-600">记录详情</span>
+          <span className="text-gray-600">{t('detail.recordDetail')}</span>
         </nav>
 
         {/* 返回按钮 */}
@@ -173,7 +175,7 @@ export default function RecordDetailPage() {
           className="mb-6 flex items-center"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          返回
+          {t('detail.back')}
         </Button>
 
         {/* 记录详情卡片 */}
@@ -191,7 +193,7 @@ export default function RecordDetailPage() {
                   <CheckCircle className="h-6 w-6 text-green-500" />
                 )}
                 <span>
-                  {submission.result === 'failure' ? '接码失败记录' : '接码成功记录'}
+                  {submission.result === 'failure' ? t('detail.smsFailureRecord') : t('detail.smsSuccessRecord')}
                 </span>
               </CardTitle>
               <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -203,7 +205,7 @@ export default function RecordDetailPage() {
           <CardContent className="space-y-6">
             {/* 网站信息 */}
             <div>
-              <h3 className="font-semibold text-gray-700 mb-2">网站信息</h3>
+              <h3 className="font-semibold text-gray-700 mb-2">{t('detail.websiteInfo')}</h3>
               <div className="bg-white p-4 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -256,7 +258,7 @@ export default function RecordDetailPage() {
                       to={`/website/${submission.website.id}`}
                       className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                      查看该网站的所有记录 →
+                      {t('detail.viewAllWebsiteRecords')}
                     </Link>
                   </div>
                 )}
@@ -265,10 +267,10 @@ export default function RecordDetailPage() {
 
             {/* 国家信息 */}
             <div>
-              <h3 className="font-semibold text-gray-700 mb-2">国家信息</h3>
+              <h3 className="font-semibold text-gray-700 mb-2">{t('detail.countryInfo')}</h3>
               <div className="bg-white p-4 rounded-lg">
                 <div className="font-medium text-lg">
-                  {submission.country?.name || t('guide.unknownCountry')}
+                  {submission.country?.name ? getLocalizedCountryName(submission.country.name, i18n.language) : t('guide.unknownCountry')}
                   {submission.country?.code && (
                     <span className="text-gray-500 ml-2">({submission.country.code})</span>
                   )}
@@ -282,7 +284,7 @@ export default function RecordDetailPage() {
                       to={`/country/${submission.country.code}`}
                       className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                      查看该国家的所有记录 →
+                      {t('detail.viewAllCountryRecords')}
                     </Link>
                   </div>
                 )}
@@ -291,7 +293,7 @@ export default function RecordDetailPage() {
 
             {/* 项目信息 */}
             <div>
-              <h3 className="font-semibold text-gray-700 mb-2">项目信息</h3>
+              <h3 className="font-semibold text-gray-700 mb-2">{t('detail.projectInfo')}</h3>
               <div className="bg-white p-4 rounded-lg">
                 <div className="font-medium text-lg">
                   {submission.project?.name || t('guide.unknownProject')}
@@ -302,7 +304,7 @@ export default function RecordDetailPage() {
                       to={`/project/${submission.project.code}`}
                       className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                     >
-                      查看该项目的所有记录 →
+                      {t('detail.viewAllProjectRecords')}
                     </Link>
                   </div>
                 )}
@@ -312,7 +314,7 @@ export default function RecordDetailPage() {
             {/* 备注 */}
             {submission.note && (
               <div>
-                <h3 className="font-semibold text-gray-700 mb-2">备注</h3>
+                <h3 className="font-semibold text-gray-700 mb-2">{t('detail.note')}</h3>
                 <div className="bg-white p-4 rounded-lg">
                   <div className="text-gray-700">
                     <SmartLinkReplacer>{submission.note}</SmartLinkReplacer>
@@ -342,7 +344,7 @@ export default function RecordDetailPage() {
         {/* 相关记录建议 */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>相关记录</CardTitle>
+            <CardTitle>{t('detail.relatedRecords')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -351,8 +353,8 @@ export default function RecordDetailPage() {
                   to={`/website/${submission.website.id}`}
                   className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <h4 className="font-medium">{submission.website.name} 的所有记录</h4>
-                  <p className="text-sm text-gray-600 mt-1">查看该网站的所有接码记录</p>
+                  <h4 className="font-medium">{submission.website.name}{t('detail.allRecordsOf')}</h4>
+                  <p className="text-sm text-gray-600 mt-1">{t('detail.viewAllRecordsOfWebsite')}</p>
                 </Link>
               )}
               {submission.country && (
@@ -360,8 +362,8 @@ export default function RecordDetailPage() {
                   to={`/country/${submission.country.code}`}
                   className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <h4 className="font-medium">{submission.country.name} 的所有记录</h4>
-                  <p className="text-sm text-gray-600 mt-1">查看该国家的所有接码记录</p>
+                  <h4 className="font-medium">{getLocalizedCountryName(submission.country.name, i18n.language)}{t('detail.allRecordsOf')}</h4>
+                  <p className="text-sm text-gray-600 mt-1">{t('detail.viewAllRecordsOfCountry')}</p>
                 </Link>
               )}
               {submission.project && (
@@ -369,16 +371,16 @@ export default function RecordDetailPage() {
                   to={`/project/${submission.project.code}`}
                   className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <h4 className="font-medium">{submission.project.name} 的所有记录</h4>
-                  <p className="text-sm text-gray-600 mt-1">查看该项目的所有接码记录</p>
+                  <h4 className="font-medium">{submission.project.name}{t('detail.allRecordsOf')}</h4>
+                  <p className="text-sm text-gray-600 mt-1">{t('detail.viewAllRecordsOfProject')}</p>
                 </Link>
               )}
               <Link 
                 to="/"
                 className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors"
               >
-                <h4 className="font-medium">最新记录</h4>
-                <p className="text-sm text-gray-600 mt-1">查看所有最新的接码记录</p>
+                <h4 className="font-medium">{t('detail.latestRecords')}</h4>
+                <p className="text-sm text-gray-600 mt-1">{t('detail.viewAllLatestRecords')}</p>
               </Link>
             </div>
           </CardContent>

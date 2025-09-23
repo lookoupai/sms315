@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { getLocalizedCountryName } from '../utils/country-names'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -14,7 +15,7 @@ import { Pagination } from '../components/pagination'
 export default function CountryDetailPage() {
   const { code } = useParams<{ code: string }>()
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [country, setCountry] = useState<Country | null>(null)
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,11 +42,11 @@ export default function CountryDetailPage() {
           setTotalItems(submissionsData.total)
           setHasMore(submissionsData.hasMore)
         } else {
-          setError('国家不存在')
+          setError(t('detail.countryNotFound'))
         }
       } catch (err) {
         console.error('获取国家详情失败:', err)
-        setError('获取国家详情失败')
+        setError(t('detail.fetchCountryFailed'))
       } finally {
         setLoading(false)
       }
@@ -65,17 +66,18 @@ export default function CountryDetailPage() {
     const now = new Date()
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     
-    if (diffInHours < 1) return '刚刚'
-    if (diffInHours < 24) return `${diffInHours}小时前`
-    if (diffInHours < 24 * 7) return `${Math.floor(diffInHours / 24)}天前`
+    if (diffInHours < 1) return t('detail.justNow')
+    if (diffInHours < 24) return `${diffInHours}${t('detail.hoursAgo')}`
+    if (diffInHours < 24 * 7) return `${Math.floor(diffInHours / 24)}${t('detail.daysAgo')}`
     return date.toLocaleDateString('zh-CN')
   }
 
   // 页面标题和描述
   useEffect(() => {
     if (country) {
-      const title = `${country.name} (${country.code}) - 接码国家详情`
-      const description = `查看${country.name}的所有接码记录，包括成功和失败的案例。电话区号：${country.phone_code}`
+      const localizedCountryName = getLocalizedCountryName(country.name, i18n.language)
+      const title = `${localizedCountryName} (${country.code}) - ${t('detail.countryDetailTitle')}`
+      const description = `查看${localizedCountryName}的所有接码记录，包括成功和失败的案例。${t('detail.phoneCode')}${country.phone_code}`
       
       document.title = `${title} - ${t('nav.title')}`
       
@@ -119,7 +121,7 @@ export default function CountryDetailPage() {
         "url": window.location.href,
         "mainEntity": {
           "@type": "Country",
-          "name": country.name,
+          "name": getLocalizedCountryName(country.name, i18n.language),
           "alternateName": country.code,
           "telephone": country.phone_code
         }
@@ -145,7 +147,7 @@ export default function CountryDetailPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">正在加载国家详情...</p>
+          <p className="text-gray-600">{t('detail.loadingCountry')}</p>
         </div>
       </div>
     )
@@ -157,10 +159,10 @@ export default function CountryDetailPage() {
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center">
             <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">错误</h3>
-            <p className="text-gray-600 mb-4">{error || '国家不存在'}</p>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('detail.error')}</h3>
+            <p className="text-gray-600 mb-4">{error || t('detail.countryNotFound')}</p>
             <Button onClick={() => navigate('/')}>
-              返回首页
+              {t('detail.backToHome')}
             </Button>
           </CardContent>
         </Card>
@@ -181,12 +183,12 @@ export default function CountryDetailPage() {
         <nav className="flex items-center space-x-2 text-sm mb-6">
           <Link to="/" className="flex items-center text-blue-600 hover:text-blue-800">
             <Globe className="h-4 w-4 mr-1" />
-            首页
+            {t('detail.home')}
           </Link>
           <span className="text-gray-400">/</span>
-          <span className="text-gray-600">国家详情</span>
+          <span className="text-gray-600">{t('detail.countryDetail')}</span>
           <span className="text-gray-400">/</span>
-          <span className="text-gray-900 font-medium">{country.name}</span>
+          <span className="text-gray-900 font-medium">{getLocalizedCountryName(country.name, i18n.language)}</span>
         </nav>
 
         {/* 返回按钮 */}
@@ -196,7 +198,7 @@ export default function CountryDetailPage() {
           className="mb-6 flex items-center"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          返回
+          {t('detail.back')}
         </Button>
 
         {/* 国家信息卡片 */}
@@ -205,13 +207,13 @@ export default function CountryDetailPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <MapPin className="h-6 w-6 text-blue-500" />
-                <span>{country.name} ({country.code})</span>
+                <span>{getLocalizedCountryName(country.name, i18n.language)} ({country.code})</span>
               </CardTitle>
             </div>
           </CardHeader>
           <CardContent>
             <div className="mb-4">
-              <span className="font-medium text-gray-700">电话区号：</span>
+              <span className="font-medium text-gray-700">{t('detail.phoneCode')}</span>
               <span className="ml-2 text-lg">{country.phone_code}</span>
             </div>
             
@@ -220,19 +222,19 @@ export default function CountryDetailPage() {
               <Card className="bg-red-50 border-red-200">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-red-600">{failureCount}</div>
-                  <div className="text-sm text-red-700">失败记录</div>
+                  <div className="text-sm text-red-700">{t('detail.failureRecords')}</div>
                 </CardContent>
               </Card>
               <Card className="bg-green-50 border-green-200">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">{successCount}</div>
-                  <div className="text-sm text-green-700">成功记录</div>
+                  <div className="text-sm text-green-700">{t('detail.successRecords')}</div>
                 </CardContent>
               </Card>
               <Card className="bg-blue-50 border-blue-200">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-blue-600">{totalItems}</div>
-                  <div className="text-sm text-blue-700">总记录数</div>
+                  <div className="text-sm text-blue-700">{t('detail.totalRecords')}</div>
                 </CardContent>
               </Card>
             </div>
@@ -242,13 +244,13 @@ export default function CountryDetailPage() {
         {/* 提交记录列表 */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>接码记录</CardTitle>
+            <CardTitle>{t('detail.smsRecords')}</CardTitle>
           </CardHeader>
           <CardContent>
             {submissions.length === 0 ? (
               <div className="text-center py-8">
                 <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">暂无记录</p>
+                <p className="text-gray-500">{t('detail.noRecords')}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -323,7 +325,7 @@ export default function CountryDetailPage() {
                                       to={`/website/${submission.website.id}`}
                                       className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
                                     >
-                                      查看该网站的所有记录 →
+                                      {t('detail.viewAllWebsiteRecords')}
                                     </Link>
                                   </div>
                                 )}
@@ -339,7 +341,7 @@ export default function CountryDetailPage() {
                                       to={`/project/${submission.project.code}`}
                                       className="text-xs text-blue-600 hover:text-blue-800 hover:underline"
                                     >
-                                      查看该项目的所有记录 →
+                                      {t('detail.viewAllProjectRecords')}
                                     </Link>
                                   </div>
                                 )}
@@ -362,7 +364,7 @@ export default function CountryDetailPage() {
                             to={`/record/${submission.id}`}
                             className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
                           >
-                            查看详情 →
+                            {t('detail.viewDetails')}
                           </Link>
                         </div>
                       </div>
